@@ -11,6 +11,7 @@ ProductID=StringVar()
 VendorID=StringVar()
 Quantity = IntVar()
 Send=StringVar()
+price=IntVar()
 
 
 
@@ -19,6 +20,7 @@ def database():
    Ven_ID=VendorID.get()
    Qty=Quantity.get()
    Send_Date=Send.get()
+   Price=price.get()
   
 
    #with conn:
@@ -33,7 +35,10 @@ def database():
    driver= '{ODBC Driver 17 for SQL Server}'
    cnxn = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;")
    cursor = cnxn.cursor()
-   cursor.execute("insert into vendor_order(stock_id,vendor_id,quantity,send_date) values(?,?,?,?)",(Prod_ID,Ven_ID,Qty,Send_Date))
+   #cursor.execute("insert into vendor_order(stock_id,vendor_id,quantity,send_date) values(?,?,?,?)",(Prod_ID,Ven_ID,Qty,Send_Date))
+   sql="EXEC	[dbo].[prc_createOrder] @stock = ?,@venid =?,@qty = ?,@sdate = ?,@price = ?"
+   values=(Prod_ID,Ven_ID,Qty,Send_Date,Price)
+   cursor.execute(sql,values)
    cnxn.commit()
    if(cursor.rowcount):
       showinfo("Sucessful", "Order sucessful placed")
@@ -68,6 +73,12 @@ label_4.place(x=70,y=280)
 
 entry_4 = Entry(root,textvar=Send)
 entry_4.place(x=240,y=280)
+
+label_5 = Label(root, text="Sell Price",width=20,font=("bold", 10))
+label_5.place(x=70,y=320)
+
+entry_5 = Entry(root,textvar=price)
+entry_5.place(x=240,y=320)
 
 
 

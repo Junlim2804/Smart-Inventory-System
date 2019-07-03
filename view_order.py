@@ -46,7 +46,7 @@ i=1
 e=[range(100)]
 for x in cursor.fetchall():
     for j in range(len(x)):
-        entry=Label(root,text=x[j])
+        entry=Label(root,text=x[j],bg="#FFFFFF")
         entry.grid(row=i,column=j)
         j=j+1
 
