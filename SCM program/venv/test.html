@@ -1,0 +1,41 @@
+<html>
+
+<script type="text/javascript">
+  (function() {
+    var fn = function() {
+      Bokeh.safely(function() {
+        (function(root) {
+          function embed_document(root) {
+
+          var docs_json = '{"15850507-8357-46b6-8bf3-d72e4c6ccff8":{"roots":{"references":[{"attributes":{"formatter":{"id":"1030","type":"BasicTickFormatter"},"ticker":{"id":"1017","type":"BasicTicker"}},"id":"1016","type":"LinearAxis"},{"attributes":{},"id":"1030","type":"BasicTickFormatter"},{"attributes":{},"id":"1010","type":"LinearScale"},{"attributes":{"below":[{"id":"1012","type":"CategoricalAxis"}],"center":[{"id":"1015","type":"Grid"},{"id":"1020","type":"Grid"}],"left":[{"id":"1016","type":"LinearAxis"}],"plot_height":250,"renderers":[{"id":"1025","type":"GlyphRenderer"}],"title":{"id":"1002","type":"Title"},"toolbar":{"id":"1021","type":"Toolbar"},"toolbar_location":null,"x_range":{"id":"1004","type":"FactorRange"},"x_scale":{"id":"1008","type":"CategoricalScale"},"y_range":{"id":"1006","type":"DataRange1d"},"y_scale":{"id":"1010","type":"LinearScale"}},"id":"1001","subtype":"Figure","type":"Plot"},{"attributes":{},"id":"1017","type":"BasicTicker"},{"attributes":{"grid_line_color":"red","ticker":{"id":"1013","type":"CategoricalTicker"}},"id":"1015","type":"Grid"},{"attributes":{},"id":"1008","type":"CategoricalScale"},{"attributes":{"fill_color":{"value":"#1f77b4"},"line_color":{"value":"#1f77b4"},"top":{"field":"top"},"width":{"value":0.5},"x":{"field":"x"}},"id":"1023","type":"VBar"},{"attributes":{"callback":null,"start":0},"id":"1006","type":"DataRange1d"},{"attributes":{},"id":"1028","type":"CategoricalTickFormatter"},{"attributes":{},"id":"1033","type":"Selection"},{"attributes":{"data_source":{"id":"1022","type":"ColumnDataSource"},"glyph":{"id":"1023","type":"VBar"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"1024","type":"VBar"},"selection_glyph":null,"view":{"id":"1026","type":"CDSView"}},"id":"1025","type":"GlyphRenderer"},{"attributes":{"formatter":{"id":"1028","type":"CategoricalTickFormatter"},"ticker":{"id":"1013","type":"CategoricalTicker"}},"id":"1012","type":"CategoricalAxis"},{"attributes":{"source":{"id":"1022","type":"ColumnDataSource"}},"id":"1026","type":"CDSView"},{"attributes":{},"id":"1013","type":"CategoricalTicker"},{"attributes":{},"id":"1032","type":"UnionRenderers"},{"attributes":{"callback":null,"factors":["Argentina","Brazil","Spain","Portugal"]},"id":"1004","type":"FactorRange"},{"attributes":{"callback":null,"data":{"top":[5,3,4,2],"x":["Argentina","Brazil","Spain","Portugal"]},"selected":{"id":"1033","type":"Selection"},"selection_policy":{"id":"1032","type":"UnionRenderers"}},"id":"1022","type":"ColumnDataSource"},{"attributes":{"dimension":1,"ticker":{"id":"1017","type":"BasicTicker"}},"id":"1020","type":"Grid"},{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"value":"#1f77b4"},"line_alpha":{"value":0.1},"line_color":{"value":"#1f77b4"},"top":{"field":"top"},"width":{"value":0.5},"x":{"field":"x"}},"id":"1024","type":"VBar"},{"attributes":{"text":"WC Counts"},"id":"1002","type":"Title"},{"attributes":{"active_drag":"auto","active_inspect":"auto","active_multi":null,"active_scroll":"auto","active_tap":"auto"},"id":"1021","type":"Toolbar"}],"root_ids":["1001"]},"title":"Bokeh Application","version":"1.3.4"}}';
+          var render_items = [{"docid":"15850507-8357-46b6-8bf3-d72e4c6ccff8","roots":{"1001":"d8eb1d4f-77df-4d5a-9b8a-84ce03731f91"}}];
+          root.Bokeh.embed.embed_items(docs_json, render_items);
+
+          }
+          if (root.Bokeh !== undefined) {
+            embed_document(root);
+          } else {
+            var attempts = 0;
+            var timer = setInterval(function(root) {
+              if (root.Bokeh !== undefined) {
+                embed_document(root);
+                clearInterval(timer);
+              }
+              attempts++;
+              if (attempts > 100) {
+                console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                clearInterval(timer);
+              }
+            }, 10, root)
+          }
+        })(window);
+      });
+    };
+    if (document.readyState != "loading") fn();
+    else document.addEventListener("DOMContentLoaded", fn);
+  })();
+</script>
+<body>
+<div class="bk-root" id="483b3d6b-1135-405f-b5fd-b8c1ae2fb7fd" data-root-id="1001"></div>
+</body>
+</html>

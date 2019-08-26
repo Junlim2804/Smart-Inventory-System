@@ -6,18 +6,10 @@
 #    Jun 28, 2019 11:26:37 PM CST  platform: Windows NT
 
 import sys
+import tkinter as tk
 
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
-
-try:
-    import ttk
-    py3 = False
-except ImportError:
-    import tkinter.ttk as ttk
-    py3 = True
+import tkinter.ttk as ttk
+py3 = True
 
 
 

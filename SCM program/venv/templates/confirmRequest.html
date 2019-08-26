@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  function selected(x) {
+    document.getElementById('selected_stock').value = x
+}
+</script>
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: black;
+  margin-left: 30%
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Add padding to containers */
+.container {
+  padding: 16px;
+  background-color: white;
+}
+
+/* Full-width input fields */
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  display: inline-block;
+  border: none;
+  background: #f1f1f1;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Overwrite default styles of hr */
+hr {
+  border: 1px solid #f1f1f1;
+  margin-bottom: 25px;
+}
+
+/* Set a style for the submit button */
+.registerbtn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 50%;
+  opacity: 0.9;
+}
+
+.registerbtn:hover {
+  opacity: 1;
+}
+
+/* Add a blue text color to links */
+a {
+  color: dodgerblue;
+}
+
+/* Set a grey background color and center the text of the "sign in" section */
+.signin {
+  background-color: #f1f1f1;
+  text-align: center;
+}
+</style>
+</head>
+<body style="width:50%">
+
+<form action="http://localhost:5000/addOrder" method="POST">
+  <div class="container">
+    <h1>Confirm Request({{data[0][0]}})</h1>
+    <h3>Request At {{data[0][7]}}</h3>
+    <input type="hidden" value='{{data[0][0]}}' name="rid">
+  
+    <hr>
+    <table>
+      <tr>
+        <td>
+            <label for="Product ID"><b>Product ID</b></label>
+        </td>
+        <td>
+            <label for="Product ID"><b>Product Name</b></label>
+        </td>
+      </tr>
+      <tr>
+          <td>
+              <input type="text" value='{{data[0][3]}}' name="pid" readonly >
+          </td>
+          <td>
+              <input type="text" value='{{data[0][4]}}' name="pname" readonly >
+          </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="Vendor ID"><b>Vendor ID</b></label>
+            </td>
+            <td>
+                <label for="Vendor Name"><b>Vendor Name</b></label>
+            </td>
+          </tr>
+          <tr>
+              <td>
+                  <input type="text"  value='{{data[0][1]}}' name="vid" readonly>
+              </td>
+              <td>
+                  <input type="text"  value='{{data[0][2]}}' name="vname" readonly >
+              </td>
+            </tr>
+    </table>
+  
+    
+   
+
+    <label for="Quantity"><b>Quantity</b></label>
+    <input type="text" value={{data[0][5]}} name="qty" readonly>
+
+    <label for="Request_price"><b>Price</b></label>
+    <input type="text" value={{data[0][6]}} name="price" >
+    <table style='border:1px solid black;border-collapse: collapse;text-align: center;width:100%;box-sizing: border-box;'>
+        <tr style='background-color: grey'>  
+          <th></th>
+          <th>Stock ID</th>
+          <th>Date Receive</th>
+          <th>Condition</th>
+          <th>Price Per Unit</th>   
+          <th>Quantity Left</th>
+        </tr>
+      {% for item in data2 %}
+      
+      <tr style='border:1px solid black;'>
+        <td><button type="button" onclick="selected('{{item[1]}}')">Select</button></td>      
+        <td>{{item[1]}}</td>
+        <td>{{item[2]}}</td>
+        <td>{{item[3]}}</td>
+        <td>{{item[4]}}</td>
+        <td>{{item[5]}}</td>
+     
+      </tr>
+
+      {% endfor %}
+      </table>
+      <label for="Stock_ID"><b>Stock Selected</b></label>
+      <input type="text" id='selected_stock' placeholder="Choose From Table" name="sid" readonly >
+
+    <hr>
+
+      
+
+    <button type="submit" class="registerbtn">Accept</button><button type="submit" style="background-color: red" class="registerbtn">Reject</button>
+  </div>
+  
+
+</form>
+
+</body>
+</html>

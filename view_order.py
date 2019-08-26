@@ -32,12 +32,12 @@ l6=Label(root,text="Sell_price")
 l6.grid(row=0,column=5)
 
 
-server = 'tcp:fypscm.database.windows.net,1433'
+server = '(localdb)\MSSQLLocalDB'
 database = 'SCMdb'
-username = 'jl2804'
-password = 'TauJun2804'
+username = 'Guest'
+password = 'Guest'
 driver= '{ODBC Driver 17 for SQL Server}'
-cnxn = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;")
+cnxn = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 cursor = cnxn.cursor()
 cursor.execute("select * from vendor_order")
 

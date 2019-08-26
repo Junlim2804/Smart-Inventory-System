@@ -1,11 +1,12 @@
 from tkinter import *
 import pyodbc
 from tkinter.messagebox import showinfo
-
+from calander import *
 root = Tk()
 root.geometry('500x500')
 root.title("Add stock to warehouse")
-
+ttkcal = Calendar(firstweekday=calendar.SUNDAY)
+ttkcal.place(x=240,y=380)
 StockID=StringVar()
 ProductID=StringVar()
 dateReceive=StringVar()
@@ -13,10 +14,10 @@ condition=StringVar()
 Retail_price = DoubleVar()
 Quantity=IntVar()
 
-server = 'tcp:fypscm.database.windows.net,1433'
+server = '(localdb)\MSSQLLocalDB'
 db = 'SCMdb'
-username = 'jl2804'
-password = 'TauJun2804'
+username = 'Guest'
+password = 'Guest'
 driver= '{ODBC Driver 17 for SQL Server}'
 
 
@@ -32,7 +33,7 @@ def database():
     Qty=Quantity.get()
 
 
-    cnxn = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+db+";Uid="+username+";Pwd="+password+";Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;")
+    cnxn = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+db+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
     cursor = cnxn.cursor()
     cursor.execute("insert into warehouse values(?,?,?,?,?,?)",(Stock_ID,Prod_ID,Receive_Date,Con,Re_price,Qty))
     cnxn.commit()
@@ -89,7 +90,7 @@ entry_6.place(x=240,y=370)
 label_8 = Label(root, text="Type",width=20,font=("bold", 10))
 label_8.place(x=70,y=420)
 
-cnxn = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+db+";Uid="+username+";Pwd="+password+";Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;")
+cnxn = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+db+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 cursor = cnxn.cursor()
 cursor.execute("Select prod_id from Product")
 x=cursor.fetchall()
