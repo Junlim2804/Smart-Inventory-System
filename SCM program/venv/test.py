@@ -20,27 +20,19 @@ driver= '{ODBC Driver 17 for SQL Server}'
 con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 SQL_Query = pd.read_sql_query("set nocount on exec [prc_getsalesbymonth]", con)
 df = pd.DataFrame(SQL_Query)
-iris_df = df.copy()
-feature_names = iris_df.columns[0:-1].values.tolist()
-def create_figure(current_feature_name, bins):
-   p = figure(x_range=current_feature_name,legend='top_right',width=600,height=400)
-   # Set the x axis label
-   p.xaxis.axis_label = current_feature_name
-   # Set the y axis label
-   p.yaxis.axis_label = 'Count'
-   return p
 
-teams = ['Argentina', 'Brazil', 'Spain', 'Portugal']
+
+X = df.columns[1:13].values
 # Activity: We experimented with the Hover Tool and the
 # Box Select tool in the previous example, try to
 # include those tools in this graph
 # Number of world cups that the team has won
-wc_won = [5, 3, 4, 2]
+y = df.iloc[1,1:13].values
 # Setting toolbar_location=None and tools="" essentially
 # hides the toolbar from the graph
-barchart = figure(x_range=teams, plot_height=250, title="WC Counts",
+barchart = figure(x_range=X, plot_height=250, title="Stock Counts",
          toolbar_location=None, tools="")
-barchart.vbar(x=teams, top=wc_won, width=0.5)
+barchart.vbar(x=X, top=y, width=0.5)
 # Acitivity: Play with the width variable and see what
 # happens. In particular, try to set a value above 1 for
 # it 

@@ -11,6 +11,10 @@ from bokeh.plotting import figure
 
 from bokeh.embed import components
 from bokeh.models.sources import ColumnDataSource
+from pmdarima.arima import auto_arima
+import matplotlib.pyplot as plt
+import numpy as np
+from bokeh.models import HoverTool
 
 
 app = Flask(__name__)
@@ -20,55 +24,36 @@ username = 'Guest'
 password = 'Guest'
 driver= '{ODBC Driver 17 for SQL Server}'
 con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
-#SQL_Query = pd.read_sql_query("set nocount on exec [prc_getsalesbymonth]", con)
-#df = pd.DataFrame(SQL_Query)
-#iris_df = df.copy()
-#feature_names = iris_df.columns[0:-1].values.tolist()
 
 
-@app.route('/test')
+
+
+@app.route('/showGraph')
 def index():
-   teams = ['Argentina', 'Brazil', 'Spain', 'Portugal']
+   SQL_Query = pd.read_sql_query("set nocount on exec [prc_getsalesbymonth]", con)
+   df = pd.DataFrame(SQL_Query)
+   con.close()
+   X = df.columns[1:13].values
 
-   # Activity: We experimented with the Hover Tool and the
-   # Box Select tool in the previous example, try to
-   # include those tools in this graph
-
-   # Number of world cups that the team has won
-   wc_won = [5, 3, 4, 2]
-
-   # Setting toolbar_location=None and tools="" essentially
-   # hides the toolbar from the graph
-   barchart = figure(x_range=teams, plot_height=250, title="WC Counts",
-            toolbar_location=None, tools="")
-
-   barchart.vbar(x=teams, top=wc_won, width=0.5)
-
-   # Acitivity: Play with the width variable and see what
-   # happens. In particular, try to set a value above 1 for
-   # it 
+   y = df.iloc[1,1:13].values
+   hover1 = HoverTool(tooltips=[("Quantity", "@top")])
+   barchart = figure(x_range=X, plot_height=250, title="Stock Counts",
+            toolbar_location=None, tools=[hover1])
+   barchart.vbar(x=X, top=y, width=0.5)
 
    barchart.xgrid.grid_line_color = 'red'
    barchart.y_range.start = 0
    script, div = components(barchart)
-   bars_count=1
-   return render_template("test.html", bars_count=bars_count,
-                           the_div=div, the_script=script)
-#
-#SQL_Query=pd.read_sql_query("set nocount on exec [prc_getsalesbymonth] ",con)
-#df=pd.DataFrame(SQL_Query)
-#df=pd.DataFram(SQL_Query)
-#iris_df=df.copy()
-#feature_names=iris_df.column[0:-1].values.tolist()
-## Determine the selected feature
-#current_feature_name = "Jan"
-#
-## Create the plot
-#plot = create_figure(current_feature_name, 10)
-#	
-## Embed plot into HTML via Flask Render
-#script, div = components(plot)
-#return render_template("iris_index1.html", script=script, div=div, feature_names=feature_names,  current_feature_name=current_feature_name)
+   hover2 = HoverTool(tooltips=[("Quantity", "@y")])
+   p = figure(plot_width=400, plot_height=400,x_range=['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep',
+       'oct', 'nov', 'dec'],tools=[hover2])
+   from bokeh.models import DatetimeTickFormatter
+   # add a line renderer
+
+   p.line(y=df.iloc[1,1:13].values,x=df.columns[1:13].values,line_width=2)
+   script2, div2 = components(p)
+   return render_template("showGraph.html", bars_count=1,
+                           the_div=div, the_script=script,div=div2,script=script2)
 
 
 @app.route('/showStock')
@@ -76,32 +61,60 @@ def showStock():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
    cur = con.cursor()
-   cur.execute("SELECT * FROM warehouse")
+   cur.execute("select * from v_warehouse_stock order by date_received asc")
    data = cur.fetchall()
    cur.close()
    con.close()
    return render_template('showStock.html',data=data)
-@app.route('/addstock',methods = ['POST'])
+
+@app.route('/showVendorRequest')
+def showVendorRequest():
+   con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
+
+   cur = con.cursor()
+   cur.execute("select * from request")
+   data = cur.fetchall()
+   cur.close()
+   con.close()
+   return render_template('showStock.html',data=data)
+
+@app.route('/addstock')
 def addStock():
-   Stock_ID=request.form['sid']
+   con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
+   cur = con.cursor()
+   cur.execute("select * from product")
+   data = cur.fetchall()
+   cur.execute("SELECT CAST(current_value as int) FROM sys.sequences WHERE name = 'seq_warehouse' ;")
+   seq=cur.fetchval()
+   seq='sk'+str(seq+1)
+   cur.close()
+   con.close()
+   return render_template('addStock.html',data=data,seq=seq)
+@app.route('/addingstock',methods = ['POST'])
+def addingStock():
+   #Stock_ID=request.form['sid']
+   Supplier_ID=request.form['sup_id']
    Prod_ID=request.form['pid']
    Receive_Date=request.form['drec']
    Condition=request.form['condition']   
    price=request.form['price']
    quantity=request.form['qty']
+   
+   
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
    cur=con.cursor()
+   
    try:
-      cur.execute("insert into warehouse values(?,?,?,?,?,?)",(Stock_ID,Prod_ID,Receive_Date,Condition,price,quantity))
+      cur.execute("insert into warehouse values(CONCAT('sk', Next value for seq_warehouse),?,?,?,?,?,?,?)",(Prod_ID,Receive_Date,Condition,price,quantity,quantity,Supplier_ID))
       con.commit()
       if(cur.rowcount):
          return ("Order sucessful placed")
       else:
          return "error"
-   except:
-      return "error in sql"
-
+   except Exception as e:
+      return str(e)
+      
 @app.route('/addRequest',methods=['POST'])
 def addRequest():
    
@@ -144,6 +157,46 @@ def placeOrder():
 def home():
    return render_template('index.html')
 
+@app.route('/vendorRequest')
+def vendorRequest():
+   return render_template('addRequest.html')
+
+@app.route('/forecast')
+def forecast():   
+   SQL_Query = pd.read_sql_query("select * from show_sales where prod_id='pr1'", con)
+   df=pd.DataFrame(SQL_Query)
+   df['date'] = pd.to_datetime(df['date'])
+   df=df.drop(['prod_id'], axis=1)
+   df=df.set_index('date')
+   y=df
+   y = df['Quantity'].resample('MS').sum()
+   train=y[0:-2]
+   valid=y[-12:]
+
+
+   model = auto_arima(y[:-1], trace=True, start_p=3, start_q=3, start_P=1, start_Q=5,
+                        max_p=7, max_q=7, max_P=7, max_order=20,max_Q=6,D=1,d=1, m=1,seasonal=True,
+                        stepwise=True, error_action='ignore', suppress_warnings=True)
+   model.fit(y[:-1])
+
+   forecast = model.predict(n_periods=4)
+   #HERE IS HARDCODE
+   forecast = pd.DataFrame(forecast,index = ['2018-12-01','2019-01-01','2019-2-01','2019-3-01'],columns=['Prediction'])
+
+   hover1 = HoverTool(tooltips=[("Sales", "@y")])
+   X = ['December','January','February','March']
+
+   Y = y.iloc[-1:].values
+   Y= np.concatenate((Y, forecast['Prediction'].iloc[-3:].values))
+
+   p = figure(x_range=X, plot_height=400,x_axis_label='Month',x_minor_ticks=1,
+            title="Forecast Sales",toolbar_location=None, tools=[hover1])
+   #barchart.vbar(x=X, top=Y, width=0.2)
+   p.line(y=Y,x=X,line_width=2)
+   
+   p.y_range.start =0
+   script, div = components(p)
+   return render_template('showForecast.html',the_div=div, the_script=script)
 @app.route('/confirmRequest')
 def confirmRequest():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")

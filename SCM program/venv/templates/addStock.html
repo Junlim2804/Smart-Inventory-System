@@ -20,19 +20,29 @@ body {
 }
 
 /* Full-width input fields */
-input[type=text], input[type=password] {
+input[type=text], input[type=password],input[type=number],#cond,#ftype {
   width: 100%;
   padding: 15px;
   margin: 5px 0 22px 0;
-  display: inline-block;
+  display: inline-block;  
   border: none;
   background: #f1f1f1;
 }
 
-input[type=text]:focus, input[type=password]:focus {
+input[type=date]{
+  width: 50%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  display: inline-block;  
+  border: none;
+  background: #f1f1f1; 
+
+}
+input[type=text]:focus, input[type=password]:focus,input[type=number]:focus,input[type=date]:focus {
   background-color: #ddd;
   outline: none;
 }
+
 
 /* Overwrite default styles of hr */
 hr {
@@ -70,33 +80,52 @@ a {
 </head>
 <body style="width:40%">
 
-<form action="http://localhost:5000/addstock" method="POST">
+<form action="http://localhost:5000/addingstock" method="POST">
   <div class="container">
     <h1>Add Stock</h1>
-    <hr>
+    <hr>    
     <label for="Stock ID"><b>Stock ID</b></label>
-    <input type="text" placeholder="Enter StockID" name="sid" required>
+    <input type="text" placeholder="Enter StockID" value='{{seq}}' name="sid" required>
 
-    <label for="Product ID"><b>Product ID</b></label>
-    <input type="text" placeholder="Enter ProductID" name="pid" required>
+    <label for="Supplier ID"><b>Supplier ID</b></label>
+    <input type="text" placeholder="Enter SupplierID" name="sup_id" required>
 
+    <label for="Product ID"><b>Product Name</b></label>    
+    </br>
+   
+    <select id='ftype' name='pid' style="width:50%"> 
+        {% for item in data %}
+        <option value='pr1'>{{item[1]}}</option>
+        
+        {% endfor %}
+    </select>
+    </br>
     <label for="Date Received"><b>Date Receive</b></label>
-    <input type="text" placeholder="Enter date in yyyy-MM-dd hh:mm" name="drec" required>
+    </br>
+    <input type="date" name="drec" required>
+    </br>
 
     <label for="Condition"><b>Condition</b></label>
-    <input type="text" placeholder="Enter Character(eg. A, B ,C)" name="condition" required>
+  </br>
+  <select id='cond' name='condition' style="width:50%"> 
+      <option value='A'>A</option>
+      <option value='B'>B</option>
+      <option value='C'>C</option>
+      <option value='D'>D</option>
+  </select>
+  </br>
 
     <label for="Buy price"><b>Buy price</b></label>
     <input type="text" placeholder="100.00" name="price" required>
 
     <label for="Quantity"><b>Quantity</b></label>
-    <input type="text" placeholder="Enter Quantity" name="qty" required>
+    <input type="number" placeholder="Enter Quantity" name="qty" required>
 
 
     <hr>
    
 
-    <button type="submit" class="registerbtn">Register</button>
+    <button type="submit" class="registerbtn">Add</button>
   </div>
   
 
