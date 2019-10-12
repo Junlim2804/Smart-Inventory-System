@@ -25,17 +25,33 @@ password = 'Guest'
 driver= '{ODBC Driver 17 for SQL Server}'
 con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
-
-
-
-@app.route('/showGraph')
+from bokeh.models import DatetimeTickFormatter
+from bokeh.models.widgets import Panel,Tabs
+from bokeh.layouts import column
+@app.route('/showGraph',methods = ['GET'])
 def index():
-   SQL_Query = pd.read_sql_query("set nocount on exec [prc_getsalesbymonth]", con)
-   df = pd.DataFrame(SQL_Query)
-   con.close()
-   X = df.columns[1:13].values
 
-   y = df.iloc[1,1:13].values
+   cur = con.cursor()
+   cur.execute("select * from product")
+   product = cur.fetchall()
+   cur.execute("select DISTINCT year(send_date) from vendor_order order by year(send_date)")
+   year=cur.fetchall()
+   try:
+      Product_ID=request.args.get('pid')
+      syear=request.args.get('year')
+   except Exception as e:
+      return render_template("showGraph.html",product=product,year=year,data=e)
+   
+   if(Product_ID==None and syear==None):
+      return render_template("showGraph.html",product=product,year=year)
+
+   SQL_Query = pd.read_sql_query("set nocount on exec [prc_getsalesbymonth] @year="+syear, con)
+   
+   df = pd.DataFrame(SQL_Query)
+   
+   X = df.columns[1:13].values
+   y = df.loc[df['product_id'] == Product_ID].iloc[0,1:13].values
+   #y = df.loc[0,1:13].values
    hover1 = HoverTool(tooltips=[("Quantity", "@top")])
    barchart = figure(x_range=X, plot_height=250, title="Stock Counts",
             toolbar_location=None, tools=[hover1])
@@ -43,18 +59,22 @@ def index():
 
    barchart.xgrid.grid_line_color = 'red'
    barchart.y_range.start = 0
-   script, div = components(barchart)
+   
    hover2 = HoverTool(tooltips=[("Quantity", "@y")])
    p = figure(plot_width=400, plot_height=400,x_range=['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep',
        'oct', 'nov', 'dec'],tools=[hover2])
-   from bokeh.models import DatetimeTickFormatter
+  
    # add a line renderer
 
-   p.line(y=df.iloc[1,1:13].values,x=df.columns[1:13].values,line_width=2)
-   script2, div2 = components(p)
-   return render_template("showGraph.html", bars_count=1,
-                           the_div=div, the_script=script,div=div2,script=script2)
+   p.line(y=y,x=X,line_width=2)
+   tab1 = Panel(child=barchart, title="Bar")
+   tab2 = Panel(child=p, title="Line")
+   tabs = Tabs(tabs=[tab1, tab2])
+   script, div = components(tabs)
 
+   #script2, div2 = components(p)
+   return render_template("showGraph.html", bars_count=1,
+                           the_div=div, the_script=script,product=product,year=year)
 
 @app.route('/showStock')
 def showStock():
@@ -159,7 +179,12 @@ def home():
 
 @app.route('/vendorRequest')
 def vendorRequest():
-   return render_template('addRequest.html')
+   cur = con.cursor()
+   cur.execute("select * from product")
+   data = cur.fetchall()
+   return render_template('addRequest.html',data=data)
+
+
 
 @app.route('/forecast')
 def forecast():   
@@ -199,16 +224,29 @@ def forecast():
    return render_template('showForecast.html',the_div=div, the_script=script)
 @app.route('/confirmRequest')
 def confirmRequest():
+   request_id=request.args.get('rid')
+   if(request_id==None):
+      return showRequest()
+   con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
+
+   cur = con.cursor()
+   cur.execute("select * from view_pending where request_id='"+request_id+"'")
+   data = cur.fetchall()
+   cur.execute("select * from v_warehouse_stock where prod_id=? and cur_quantity>0 ",data[0][3])
+   data2=cur.fetchall()
+   cur.close()
+   con.close()
+   return render_template('confirmRequest.html',data=data,data2=data2)
+@app.route('/showRequest')
+def showRequest():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
    cur = con.cursor()
    cur.execute("select * from view_pending")
    data = cur.fetchall()
-   cur.execute("select * from v_warehouse_stock where prod_id=?",data[0][3])
-   data2=cur.fetchall()
+   
    cur.close()
    con.close()
-   return render_template('confirmRequest.html',data=data,data2=data2)
-
+   return render_template('showRequest.html',data=data)
 if __name__ == '__main__':
    app.run(debug = True)

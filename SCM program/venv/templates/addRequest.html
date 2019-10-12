@@ -73,11 +73,18 @@ a {
 <form action="http://localhost:5000/addRequest" method="POST">
   <div class="container">
     <h1>Request Item</h1>
-    <hr>
     
-    <label for="Product ID"><b>Product ID</b></label>
-    <input type="text" placeholder="Enter ProductID" name="pid" >
+    <hr>
 
+    <label for="Product ID"><b>Product ID</b></label>
+  </br></br>
+    <select id='ftype' name='pid' style="width:50%"> 
+      {% for item in data %}
+      <option value='pr1'>{{item[1]}}</option>
+      
+      {% endfor %}
+    </select>
+  </br></br>
     <label for="Vendor ID"><b>Vendor ID</b></label>
     <input type="text" placeholder="Enter VendorID" name="vid" >
 
