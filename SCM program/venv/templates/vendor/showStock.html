@@ -1,0 +1,80 @@
+{% extends "vendor/vendorbase.html" %}
+
+{% block content %}
+
+<div class="preloader">
+    <h1>Warehouse stock </h1>
+    <input type="checkbox" id='cbShowAll' onclick='showAll()'><f style='font-size: 14px'>show empty stock</f>
+    <script>
+       function showAll(){
+       var checkBox = document.getElementById("cbShowAll");
+       if (checkBox.checked == true){
+           document.getElementById("empty").style.display="";
+           document.getElementById("normal").style.display="none";
+       } else {
+           document.getElementById("normal").style.display="";
+           document.getElementById("empty").style.display="none";
+       }}
+   </script>
+<table style='border:1;width:100%;padding: 8px' id='normal'>
+<tr>
+<th>Stock ID</th>
+<th>Product ID</th>
+<th>Date Receive</th>
+<th>Condition</th>
+<th>Price Per Unit</th>
+<th>Current Quantity</th>
+<th>Total Quantity</th>
+</tr>
+
+
+{% for item in data %}
+{% if item[5]!=0%}
+
+<tr>
+<td>{{item[0]}}</td>
+<td>{{item[1]}}</td>
+<td>{{item[2]}}</td>
+<td>{{item[3]}}</td>
+<td>{{item[4]}}</td>
+<td>{{item[5]}}</td>
+<td>{{item[6]}}</td>
+</tr>
+{% endif %}		
+{% endfor %}
+</table>
+<table style='border:1;display:none;width:100%' id='empty' >
+<tr>
+<th>Stock ID</th>
+<th>Product ID</th>
+<th>Date Receive</th>
+<th>Condition</th>
+<th>Price Per Unit</th>
+<th>Current Quantity</th>
+<th>Total Quantity</th>
+</tr>
+
+
+{% for item in data %}
+
+
+<tr >
+<td>{{item[0]}}</td>
+<td>{{item[1]}}</td>
+<td>{{item[2]}}</td>
+<td>{{item[3]}}</td>
+<td>{{item[4]}}</td>
+<td>{{item[5]}}</td>
+<td>{{item[6]}}</td>
+</tr>
+
+{% endfor %}
+</table>      
+
+</div>
+<div id="ajax-content"></div>
+</div>
+<!--End Content-->
+</div>
+
+{% endblock %}

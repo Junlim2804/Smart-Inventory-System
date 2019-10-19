@@ -5,8 +5,18 @@
 		<title>Warehouse Mangement System 1.0</title>
 		<meta name="description" content="description">
 		<meta name="LTJ" content="Warehouse Mangement System">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<script type="text/javascript" src="../static/plugins/bootstrap/bootstrap.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.14.min.css" type="text/css" />
+        <link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.14.min.css" type="text/css" />
+        <link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.12.14.min.css" type="text/css">
+        
+        <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.14.min.js"></script>
+        <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-api-0.12.14.min.js"></script>
+        <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.14.min.js"></script>
+        <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.12.14.min.js"></script>
+		
+		
+        <script type="text/javascript" src="../static/plugins/bootstrap/bootstrap.js"></script>
 		<link href="../static/plugins/bootstrap/bootstrap.css" rel="stylesheet">
 		<link href="../static/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet">
 		<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
@@ -69,7 +79,7 @@
 	<div class="container-fluid expanded-panel">
 		<div class="row">
 			<div id="logo" class="col-xs-12 col-sm-2">
-				<a href="localhost:5000/home">Mangement</a>
+				<a href="{{ url_for('vendor.index') }}">Vendor</a>
 			</div>
 			<div id="top-panel" class="col-xs-12 col-sm-10">
 				<div class="row">
@@ -100,17 +110,18 @@
 									<span class="badge">7</span>
 								</a>
 							</li>
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle account" data-toggle="dropdown">
+							<li class="dropdown" >
+								<a class="dropdown-toggle account" data-toggle="dropdown" aria-expanded="false">
 									<div class="avatar">
 										
 									</div>
 									<i class="fa fa-angle-down pull-right"></i>
 									<div class="user-mini pull-right">
-										<span class="welcome">Welcome,</span>
-										<span>ADMIN</span>
+										<span class="welcome">Welcome</span>
+										<span>{{ session['uname'] }}</span>
 									</div>
-								</a>
+                                </a>
+ 
 								<ul class="dropdown-menu">
 									<li>
 										<a href="#">
@@ -160,59 +171,28 @@
 <!--End Header-->
 <!--Start Container-->
 <div id="main" class="container-fluid">
-	<div class="row">
-		<div id="sidebar-left" class="col-xs-2 col-sm-2">
-			<ul class="nav main-menu">
-					<li>
-						<a href="http://localhost:5000/addstock" class="ajax-link">
-
-							<span class="hidden-xs">Add Stock</span>
-						</a>
-					</li>
-				<li>
-					<a href="http://localhost:5000/showStock" class="ajax-link">
-						
-						<span class="hidden-xs">Warehouse</span>
-					</a>
-				</li>
-				<li class="dropdown">
-					<a href="http://localhost:5000/showGraph" class="dropdown-toggle">
-						
-						<span class="hidden-xs">Show graph</span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a class="ajax-link" href="ajax/charts_xcharts.html">xCharts</a></li>
-						<li><a class="ajax-link" href="ajax/charts_flot.html">Flot Charts</a></li>
-						<li><a class="ajax-link" href="ajax/charts_google.html">Google Charts</a></li>
-						<li><a class="ajax-link" href="ajax/charts_morris.html">Morris Charts</a></li>
-						<li><a class="ajax-link" href="ajax/charts_amcharts.html">AmCharts</a></li>
-						<li><a class="ajax-link" href="ajax/charts_chartist.html">Chartist</a></li>
-						<li><a class="ajax-link" href="ajax/charts_coindesk.html">CoinDesk realtime</a></li>
-					</ul>
-				</li>
-				<li class="dropdown">
-					<a href="http://localhost:5000/confirmRequest" class="dropdown-toggle">
-						
-						 <span class="hidden-xs">Confirm Request</span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a class="ajax-link" href="ajax/tables_simple.html">Simple Tables</a></li>
-						<li><a class="ajax-link" href="ajax/tables_datatables.html">Data Tables</a></li>
-						<li><a class="ajax-link" href="ajax/tables_beauty.html">Beauty Tables</a></li>
-					</ul>
-				</li>
-				<li class="dropdown">
-					<a href="http://localhost:5000/forecast" class="dropdown-toggle">						
-						 <span class="hidden-xs">Forecast Sales</span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a class="ajax-link" href="ajax/tables_simple.html">Simple Tables</a></li>
-						<li><a class="ajax-link" href="ajax/tables_datatables.html">Data Tables</a></li>
-						<li><a class="ajax-link" href="ajax/tables_beauty.html">Beauty Tables</a></li>
-					</ul>
-				</li>
-
-			</ul>
+        <div class="row">
+                <div id="sidebar-left" class="col-xs-2 col-sm-2">
+                        <ul class="nav main-menu">
+                                <li>
+                                    <a href="{{ url_for('vendor.vendorRequest') }}" class="ajax-link">
+            
+                                        <span class="hidden-xs">Request Item</span>
+                                    </a>
+								</li>
+								<li>
+                                    <a href="http://localhost:5000/addstock" class="ajax-link">
+            
+                                        <span class="hidden-xs">Add Stock</span>
+                                    </a>
+								</li>
+								<li>
+                                    <a href="http://localhost:5000/addstock" class="ajax-link">
+            
+                                        <span class="hidden-xs">Add Stock</span>
+                                    </a>
+                                </li>
+						</ul>
 		</div>
 		<!--Start Content-->
 		<div id="content" class="col-xs-12 col-sm-10">
@@ -226,92 +206,26 @@
 					<p>Donate - BTC 123Ci1ZFK5V7gyLsyVU36yPNWSB5TDqKn3</p>
 				</div>
 			</div>
-			<div class="preloader">
-				 <h1>Warehouse stock </h1>
-				 <input type="checkbox" id='cbShowAll' onclick='showAll()'><f style='font-size: 14px'>show empty stock</f>
-				 <script>
-					function showAll(){
-					var checkBox = document.getElementById("cbShowAll");
-					if (checkBox.checked == true){
-						document.getElementById("empty").style.display="";
-						document.getElementById("normal").style.display="none";
-					} else {
-						document.getElementById("normal").style.display="";
-						document.getElementById("empty").style.display="none";
-					}}
-				</script>
-      <table style='border:1;width:100%;padding: 8px' id='normal'>
-        <tr>
-          <th>Stock ID</th>
-          <th>Product ID</th>
-          <th>Date Receive</th>
-          <th>Condition</th>
-          <th>Price Per Unit</th>
-          <th>Current Quantity</th>
-          <th>Total Quantity</th>
-		</tr>
-	
-
-{% for item in data %}
-{% if item[5]!=0%}
-
-  <tr>
-  <td>{{item[0]}}</td>
-  <td>{{item[1]}}</td>
-  <td>{{item[2]}}</td>
-  <td>{{item[3]}}</td>
-  <td>{{item[4]}}</td>
-  <td>{{item[5]}}</td>
-  <td>{{item[6]}}</td>
-  </tr>
-{% endif %}		
-{% endfor %}
-</table>
-<table style='border:1;display:none;width:100%' id='empty' >
-        <tr>
-          <th>Stock ID</th>
-          <th>Product ID</th>
-          <th>Date Receive</th>
-          <th>Condition</th>
-          <th>Price Per Unit</th>
-          <th>Current Quantity</th>
-          <th>Total Quantity</th>
-		</tr>
-	
-
-		{% for item in data %}
-	  
-	  
-		<tr >
-		<td>{{item[0]}}</td>
-		<td>{{item[1]}}</td>
-		<td>{{item[2]}}</td>
-		<td>{{item[3]}}</td>
-		<td>{{item[4]}}</td>
-		<td>{{item[5]}}</td>
-		<td>{{item[6]}}</td>
-		</tr>
-
-{% endfor %}
-</table>      
- 
+			
+			<div>				
+					{% block content %}
+					{% endblock %}	
 			</div>
-			<div id="ajax-content"></div>
-		</div>
+		
 		<!--End Content-->
 	</div>
 </div>
 <!--End Container-->
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <!--<script src="http://code.jquery.com/jquery.js"></script>-->
-<script src="plugins/jquery/jquery.min.js"></script>
-<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="../static/plugins/jquery/jquery.min.js"></script>
+<script src="../static/plugins/jquery-ui/jquery-ui.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="plugins/bootstrap/bootstrap.min.js"></script>
-<script src="plugins/justified-gallery/jquery.justifiedGallery.min.js"></script>
-<script src="plugins/tinymce/tinymce.min.js"></script>
-<script src="plugins/tinymce/jquery.tinymce.min.js"></script>
+<script src="../static/plugins/bootstrap/bootstrap.min.js"></script>
+<script src="../static/plugins/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="../static/plugins/tinymce/tinymce.min.js"></script>
+<script src="../static/plugins/tinymce/jquery.tinymce.min.js"></script>
 <!-- All functions for this theme + document.ready processing -->
-<script src="js/devoops.js"></script>
+<script src="../static/js/devoops.js"></script>
 </body>
 </html>

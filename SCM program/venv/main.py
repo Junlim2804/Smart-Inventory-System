@@ -1,23 +1,31 @@
-from flask import Flask, render_template,url_for,request
 import pyodbc
-from bokeh.plotting import figure
-from bokeh.embed import components
 import pandas as pd
 import random
-from bokeh.models import (HoverTool, FactorRange, Plot, LinearAxis, Grid,
-                          Range1d)
-from bokeh.models.glyphs import VBar
-from bokeh.plotting import figure
-
-from bokeh.embed import components
-from bokeh.models.sources import ColumnDataSource
-from pmdarima.arima import auto_arima
 import matplotlib.pyplot as plt
 import numpy as np
-from bokeh.models import HoverTool
+#bokeh import
+from bokeh.plotting import figure
+from bokeh.embed import components
+from bokeh.models import HoverTool, FactorRange, Plot, LinearAxis, Grid,Range1d,DatetimeTickFormatter
+from bokeh.models.widgets import Panel,Tabs
+from bokeh.models.glyphs import VBar
+from bokeh.layouts import column
+from bokeh.plotting import figure
+from bokeh.embed import components
+from bokeh.models.sources import ColumnDataSource
+#flask import
+from flask_login import login_required, current_user
+from flask import Flask, render_template,url_for,request,redirect,Blueprint,render_template
+
+from pmdarima.arima import auto_arima
+from . import db
+from .models import User
 
 
-app = Flask(__name__)
+
+
+main = Blueprint('main', __name__)
+
 server = '(localdb)\MSSQLLocalDB'
 database = 'SCMdb'
 username = 'Guest'
@@ -25,11 +33,23 @@ password = 'Guest'
 driver= '{ODBC Driver 17 for SQL Server}'
 con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
-from bokeh.models import DatetimeTickFormatter
-from bokeh.models.widgets import Panel,Tabs
-from bokeh.layouts import column
-@app.route('/showGraph',methods = ['GET'])
+
+
+
+@main.route('/')
 def index():
+   return render_template('index.html')
+
+@main.route('/profile')
+@login_required
+def profile():
+   role=current_user.getRole()   
+   if role!="admin":
+      return redirect(url_for('auth.error'))
+   return render_template('profile.html', name=current_user.name)
+
+@main.route('/showGraph',methods = ['GET'])
+def showGraph():
 
    cur = con.cursor()
    cur.execute("select * from product")
@@ -76,7 +96,7 @@ def index():
    return render_template("showGraph.html", bars_count=1,
                            the_div=div, the_script=script,product=product,year=year)
 
-@app.route('/showStock')
+@main.route('/showStock')
 def showStock():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
@@ -87,7 +107,7 @@ def showStock():
    con.close()
    return render_template('showStock.html',data=data)
 
-@app.route('/showVendorRequest')
+@main.route('/showVendorRequest')
 def showVendorRequest():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
@@ -98,7 +118,7 @@ def showVendorRequest():
    con.close()
    return render_template('showStock.html',data=data)
 
-@app.route('/addstock')
+@main.route('/addstock')
 def addStock():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
    cur = con.cursor()
@@ -110,7 +130,7 @@ def addStock():
    cur.close()
    con.close()
    return render_template('addStock.html',data=data,seq=seq)
-@app.route('/addingstock',methods = ['POST'])
+@main.route('/addingstock',methods = ['POST'])
 def addingStock():
    #Stock_ID=request.form['sid']
    Supplier_ID=request.form['sup_id']
@@ -135,29 +155,8 @@ def addingStock():
    except Exception as e:
       return str(e)
       
-@app.route('/addRequest',methods=['POST'])
-def addRequest():
-   
-   vid=request.form['vid']
-   pid=request.form['pid']
-   qty=request.form['qty']
-   price=request.form['price']
-   
-   con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
-   cur=con.cursor()
-   try:
-      cur.execute("insert into request values(CONCAT('R',next value for seq_request),?,?,?,?,getdate(),'P')",(vid,pid,price,qty))
-      #insert into request values(next value for seq_request,'v1',100,10,getdate())
-      con.commit()
-      if(cur.rowcount):
-         return ("Request sucessful placed")
-      else:
-         return "error"
-   except Exception as e:
-      return str(e)
-
-@app.route('/addOrder',methods=['POST'])
+@main.route('/addOrder',methods=['POST'])
 def addOrder():
    
    rid=request.form['rid']
@@ -168,25 +167,16 @@ def addOrder():
    data=[rid,sid,vid,qty,price]
    return render_template('addOrder.html',data=data) 
    
-@app.route('/PlaceOrder',methods=['POST'])
+@main.route('/PlaceOrder',methods=['POST'])
 def placeOrder():
    a=request.form['sdate']
    return a
 
-@app.route('/home')
+@main.route('/home')
 def home():
    return render_template('index.html')
 
-@app.route('/vendorRequest')
-def vendorRequest():
-   cur = con.cursor()
-   cur.execute("select * from product")
-   data = cur.fetchall()
-   return render_template('addRequest.html',data=data)
-
-
-
-@app.route('/forecast')
+@main.route('/forecast')
 def forecast():   
    SQL_Query = pd.read_sql_query("select * from show_sales where prod_id='pr1'", con)
    df=pd.DataFrame(SQL_Query)
@@ -222,7 +212,7 @@ def forecast():
    p.y_range.start =0
    script, div = components(p)
    return render_template('showForecast.html',the_div=div, the_script=script)
-@app.route('/confirmRequest')
+@main.route('/confirmRequest')
 def confirmRequest():
    request_id=request.args.get('rid')
    if(request_id==None):
@@ -237,7 +227,7 @@ def confirmRequest():
    cur.close()
    con.close()
    return render_template('confirmRequest.html',data=data,data2=data2)
-@app.route('/showRequest')
+@main.route('/showRequest')
 def showRequest():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
@@ -248,5 +238,3 @@ def showRequest():
    cur.close()
    con.close()
    return render_template('showRequest.html',data=data)
-if __name__ == '__main__':
-   app.run(debug = True)
