@@ -5,6 +5,8 @@
 <div class="preloader">
     <h1>Warehouse stock </h1>
     <input type="checkbox" id='cbShowAll' onclick='showAll()'><f style='font-size: 14px'>show empty stock</f>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="../static/plugins/jquery/jquery.redirect.js"></script>
     <script>
        function showAll(){
        var checkBox = document.getElementById("cbShowAll");
@@ -15,7 +17,20 @@
            document.getElementById("normal").style.display="";
            document.getElementById("empty").style.display="none";
        }}
+
+      $(document).on("click","tr.rows", function(e){
+                var a = $(this).closest('tr').find('td:first').text();
+                          
+                var url = "{{ url_for('vendor.adjustStock') }}"
+                var form = $('<form action="' + url + '" method="get">' +
+                '<input type="text" name="vs_id" value="' + a + '" />' +
+                '</form>');
+                $('body').append(form);
+                form.submit();
+            
+    });     
    </script>
+   
 <table style='border:1;width:100%;padding: 8px' id='normal'>
 <tr>
 <th>Stock ID</th>
@@ -31,7 +46,7 @@
 {% for item in data %}
 {% if item[5]!=0%}
 
-<tr>
+<tr class='rows'>
 <td>{{item[0]}}</td>
 <td>{{item[1]}}</td>
 <td>{{item[2]}}</td>
@@ -58,7 +73,7 @@
 {% for item in data %}
 
 
-<tr >
+<tr class='rows'>
 <td>{{item[0]}}</td>
 <td>{{item[1]}}</td>
 <td>{{item[2]}}</td>

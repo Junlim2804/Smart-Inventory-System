@@ -1,0 +1,69 @@
+<html>
+<body>
+
+        <form action="http://localhost:5000/vendor/adjustStock" method="POST">
+            <div class="container">
+              <h1>Confirm Request({{data[0][0]}})</h1>
+              
+              <input type="hidden" value='{{data[0][0]}}' name="rid">
+            
+              <hr>
+              <table>
+                <tr>
+                  <td>
+                      <label for="Product ID"><b>Product ID</b></label>
+                  </td>
+                  <td>
+                      <label for="Product ID"><b>Product Name</b></label>
+                  </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" value='{{data[0][3]}}' name="pid" readonly >
+                    </td>
+                    <td>
+                        <input type="text" value='{{data[0][4]}}' name="pname" readonly >
+                    </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <label for="Vendor ID"><b>Vendor ID</b></label>
+                      </td>
+                      <td>
+                          <label for="Vendor Name"><b>Vendor Name</b></label>
+                      </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text"  value='{{data[0][1]}}' name="vid" readonly>
+                        </td>
+                        <td>
+                            <input type="text"  value='{{data[0][2]}}' name="vname" readonly >
+                        </td>
+                      </tr>
+              </table>
+            
+              
+             
+          
+              <label for="Quantity"><b>Quantity</b></label>
+              <input type="text" value={{data[0][5]}} name="qty">
+          
+              <label for="Request_price"><b>Price</b></label>
+              <input type="text" value={{data[0][6]}} name="price" >
+
+          
+              <hr>
+          
+                
+          
+              <button type="submit" class="registerbtn">Accept</button><button type="submit" style="background-color: red" class="registerbtn">Reject</button>
+            </div>
+            
+          
+          </form>
+          
+</body>
+
+
+</html>

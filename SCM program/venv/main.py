@@ -50,7 +50,7 @@ def profile():
 
 @main.route('/showGraph',methods = ['GET'])
 def showGraph():
-
+   
    cur = con.cursor()
    cur.execute("select * from product")
    product = cur.fetchall()

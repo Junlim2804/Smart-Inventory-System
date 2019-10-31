@@ -49,6 +49,7 @@ def vendorRequest():
 
 
 @vendor.route('/addRequest',methods=['POST'])
+@login_required
 def addRequest():
    #flash("Error")
    #return redirect(url_for('vendor.vendorRequest'))
@@ -57,7 +58,7 @@ def addRequest():
    qty=request.form['qty']
    price=request.form['price']
    
-   con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
+   #con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
    cur=con.cursor()
    try:
@@ -73,22 +74,40 @@ def addRequest():
        return redirect(url_for('vendor.errorMessage'))
 
 @vendor.route('/completeRequest')
+@login_required
 def showComplete():
     return "complete"
 
 @vendor.route('/vendor/showStock')
+@login_required
 def showStock():
-   con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
+   #con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
    cur = con.cursor()
-   cur.execute("select * from v_warehouse_stock order by date_received asc")
+   cur.execute("select * from v_vendor_stock where vendor_id='"+current_user.vendorID+"' order by receive_date asc")
    data = cur.fetchall()
-   cur.close()
-   con.close()
+   
    return render_template('vendor/showStock.html',data=data)
 
 @vendor.route('/errorMsg')
+@login_required
 def errorMessage():
     messages = session['errmsg'] 
     flash(messages)
     return render_template("errorMessage.html")
+
+@vendor.route('/vendor/adjustStock',methods=['GET'])
+@login_required
+def adjustStock():   
+   vs_id=request.args.get('vs_id')
+   cur = con.cursor()
+   cur.execute("select * from v_vendor_stock where vs_id='"+vs_id+"'")
+   data = cur.fetchall()
+   return render_template('vendor/adjustStock.html',data=data)   
+
+@vendor.route('/vendor/adjustStock',methods=['POST'])
+@login_required
+def adjustStocking():   
+   #vs_id=request.form['vs_id']
+   qty=request.form['qty']
+   return qty  
