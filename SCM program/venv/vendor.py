@@ -14,12 +14,13 @@ from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models.sources import ColumnDataSource
 #flask import
-from flask_login import login_required, current_user
-from flask import Flask, render_template,url_for,request,redirect,Blueprint,render_template,flash,session
+from flask_login import current_user,login_required
+from flask import Flask, render_template,url_for,request,redirect,Blueprint,render_template,flash,session,current_app
 from pmdarima.arima import auto_arima
 from . import db
 from .models import User
 
+from . import lg
 vendor = Blueprint('vendor', __name__)
 server = '(localdb)\MSSQLLocalDB'
 database = 'SCMdb'
@@ -33,14 +34,13 @@ def vendorindex():
    return "vendor"
 
 @vendor.route('/vendor/index')
-@login_required
+@lg(role="Vendor")
 def index():
    return render_template('vendor/profile.html',data=current_user.vendorID)
 
 @vendor.route('/vendorRequest')
 @login_required
-def vendorRequest():
-   
+def vendorRequest():   
    cur = con.cursor()
    cur.execute("select * from product")
    data = cur.fetchall()
@@ -81,6 +81,11 @@ def showComplete():
 @vendor.route('/vendor/showStock')
 @login_required
 def showStock():
+   if(current_user.vendorID is None):
+      return redirect(url_for('auth.error'))
+
+   
+   
    #con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
    cur = con.cursor()
@@ -111,3 +116,6 @@ def adjustStocking():
    #vs_id=request.form['vs_id']
    qty=request.form['qty']
    return qty  
+
+
+

@@ -10,4 +10,6 @@ class User(UserMixin, db.Model):
     vendorID = db.Column(db.String(10))
     def getRole(self):
         return self.role
+    def get_urole(self):
+        return self.role
 

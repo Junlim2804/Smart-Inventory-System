@@ -49,6 +49,7 @@ def profile():
    return render_template('profile.html', name=current_user.name)
 
 @main.route('/showGraph',methods = ['GET'])
+@login_required
 def showGraph():
    
    cur = con.cursor()
@@ -97,6 +98,7 @@ def showGraph():
                            the_div=div, the_script=script,product=product,year=year)
 
 @main.route('/showStock')
+@login_required
 def showStock():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
@@ -107,7 +109,10 @@ def showStock():
    con.close()
    return render_template('showStock.html',data=data)
 
+
+
 @main.route('/showVendorRequest')
+@login_required
 def showVendorRequest():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
@@ -119,6 +124,7 @@ def showVendorRequest():
    return render_template('showStock.html',data=data)
 
 @main.route('/addstock')
+@login_required
 def addStock():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
    cur = con.cursor()
@@ -131,6 +137,7 @@ def addStock():
    con.close()
    return render_template('addStock.html',data=data,seq=seq)
 @main.route('/addingstock',methods = ['POST'])
+@login_required
 def addingStock():
    #Stock_ID=request.form['sid']
    Supplier_ID=request.form['sup_id']
@@ -157,6 +164,7 @@ def addingStock():
       
 
 @main.route('/addOrder',methods=['POST'])
+@login_required
 def addOrder():
    
    rid=request.form['rid']
@@ -168,15 +176,18 @@ def addOrder():
    return render_template('addOrder.html',data=data) 
    
 @main.route('/PlaceOrder',methods=['POST'])
+@login_required
 def placeOrder():
    a=request.form['sdate']
    return a
 
 @main.route('/home')
+@login_required
 def home():
    return render_template('index.html')
 
 @main.route('/forecast')
+@login_required
 def forecast():   
    SQL_Query = pd.read_sql_query("select * from show_sales where prod_id='pr1'", con)
    df=pd.DataFrame(SQL_Query)
@@ -213,6 +224,7 @@ def forecast():
    script, div = components(p)
    return render_template('showForecast.html',the_div=div, the_script=script)
 @main.route('/confirmRequest')
+@login_required
 def confirmRequest():
    request_id=request.args.get('rid')
    if(request_id==None):
@@ -227,14 +239,15 @@ def confirmRequest():
    cur.close()
    con.close()
    return render_template('confirmRequest.html',data=data,data2=data2)
+   
 @main.route('/showRequest')
+@login_required
 def showRequest():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
    cur = con.cursor()
    cur.execute("select * from view_pending")
-   data = cur.fetchall()
-   
-   cur.close()
+   data = cur.fetchall()   
+
    con.close()
    return render_template('showRequest.html',data=data)

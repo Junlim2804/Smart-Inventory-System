@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+{% extends "base.html" %}
+
+{% block content %}
 <style>
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  background-color: black;
-  margin-left: 30%
+body{
+  line-height: 0.5;
+
 }
 
 * {
@@ -17,11 +15,12 @@ body {
 .container {
   padding: 16px;
   background-color: white;
+  height:100%
 }
 
 /* Full-width input fields */
 input[type=text], input[type=password],input[type=number],#cond,#ftype {
-  width: 100%;
+  width: 50%;
   padding: 15px;
   margin: 5px 0 22px 0;
   display: inline-block;  
@@ -58,7 +57,7 @@ hr {
   margin: 8px 0;
   border: none;
   cursor: pointer;
-  width: 100%;
+  width: 50%;
   opacity: 0.9;
 }
 
@@ -77,19 +76,20 @@ a {
   text-align: center;
 }
 </style>
-</head>
-<body style="width:40%">
+<div class="preloader">
 
 <form action="http://localhost:5000/addingstock" method="POST">
   <div class="container">
     <h1>Add Stock</h1>
     <hr>    
     <label for="Stock ID"><b>Stock ID</b></label>
+    </br>
     <input type="text" placeholder="Enter StockID" value='{{seq}}' name="sid" required>
+    </br>
 
-    <label for="Supplier ID"><b>Supplier ID</b></label>
+    <label for="Supplier ID"><b>Supplier ID</b></label></br>
     <input type="text" placeholder="Enter SupplierID" name="sup_id" required>
-
+    </br>
     <label for="Product ID"><b>Product Name</b></label>    
     </br>
    
@@ -115,21 +115,17 @@ a {
   </select>
   </br>
 
-    <label for="Buy price"><b>Buy price</b></label>
-    <input type="text" placeholder="100.00" name="price" required>
+    <label for="Buy price"><b>Buy price</b></label></br>
+    <input type="text" placeholder="100.00" name="price" required></br>
 
-    <label for="Quantity"><b>Quantity</b></label>
+    <label for="Quantity"><b>Quantity</b></label></br>
     <input type="number" placeholder="Enter Quantity" name="qty" required>
-
-
-    <hr>
-   
-
+    <br/>
     <button type="submit" class="registerbtn">Add</button>
+
   </div>
   
 
 </form>
-
-</body>
-</html>
+</div>
+{% endblock %}

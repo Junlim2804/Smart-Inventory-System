@@ -1,7 +1,8 @@
-from flask import Flask
+from flask import Flask,current_app
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager 
+from flask_login import LoginManager,current_user
 import urllib
+from functools import wraps
 # init SQLAlchemy so we can use it later in our models
 db = SQLAlchemy()
 server = '(localdb)\MSSQLLocalDB'
@@ -24,10 +25,11 @@ def create_app():
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
+
     login_manager.init_app(app)
 
     from .models import User
-
+    
     @login_manager.user_loader
     def load_user(user_id):
         # since the user_id is just the primary key of our user table, use it in the query for the user
@@ -45,3 +47,16 @@ def create_app():
     app.register_blueprint(vendor_blueprint)
 
     return app
+def lg(role="ANY"):
+   def wrapper(fn):
+      @wraps(fn)
+      def decorated_view(*args, **kwargs):
+
+         if not current_user.is_authenticated:
+            return current_app.login_manager.unauthorized()
+         urole = current_user.get_urole()
+         if ( (urole != role) and (role != "ANY")):
+            return current_app.login_manager.unauthorized()      
+         return fn(*args, **kwargs)
+      return decorated_view
+   return wrapper
