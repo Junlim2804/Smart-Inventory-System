@@ -47,7 +47,7 @@ def create_app():
     app.register_blueprint(vendor_blueprint)
 
     return app
-def lg(role="ANY"):
+def role(role="ANY"):
    def wrapper(fn):
       @wraps(fn)
       def decorated_view(*args, **kwargs):

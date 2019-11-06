@@ -1,0 +1,77 @@
+{% extends "vendor/vendorbase.html" %}
+
+{% block content %}
+<script>
+    function calulateRemaining(rowname)
+    {
+       
+        qty_sales=document.getElementById("qty_sales_"+rowname).value
+        qty_disposal=document.getElementById("qty_disposal_"+rowname).value
+        qty_opening=document.getElementById("qty_opening_"+rowname).value
+   
+        if(qty_sales==""||qty_sales==null)
+            qty_sales=0;
+        if(qty_disposal==""||qty_disposal==null)
+            qty_disposal=0;
+        var remaining=qty_opening-qty_sales-qty_disposal
+   
+        if(remaining>=0)
+        {
+            document.getElementById("qty_remaining_"+rowname).value=remaining
+        }
+        else
+        {
+            document.getElementById("qty_sales_"+rowname).value=0;
+            document.getElementById("qty_disposal_"+rowname).value=0;
+            alert("Disposal/Sales quantity cannt be higher than Opening Value")
+        }
+
+
+    }
+</script>
+<div class="preloader">
+    <h1>Warehouse stock </h1>
+  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="../static/plugins/jquery/jquery.redirect.js"></script>
+    
+<form action="#" method="POST">
+
+<table style='border:1;width:100%' >
+<tr>
+<th>Stock ID</th>
+<th>Product ID</th>
+<th>Date Receive</th>
+<th>Opening Quantity</th>
+<th>Today Price</th>
+<th>Sales Quantity</th>
+<th>Disposal Quantity</th>
+<th>Remaining Quantity</th>
+</tr>
+
+
+{% for item in data %}
+
+
+<tr class='rows'>
+<td>{{item[0]}}<input type="hidden" name="vs_id[]" value="{{item[0]}}"></td>
+<td>{{item[1]}}</td>
+<td>{{item[2]}}</td>
+<td>{{item[5]}}<input type="hidden" id="qty_opening_{{item[0]}}" value='{{item[5]}}'></td>
+<td><input type='number' id="today_price_{{item[0]}}" value=1.00 onchange='calulateRemaining("{{item[0]}}")' name='today_price[]'></td>
+<td><input type='number' id="qty_sales_{{item[0]}}" value=0 min=0 onchange='calulateRemaining("{{item[0]}}")' name='qty_sales[]'></td>
+<td><input type='number' id="qty_disposal_{{item[0]}}" value=0 min=0 onchange='calulateRemaining("{{item[0]}}")' name='qty_disposal[]'></td>
+<td><input type="text" id="qty_remaining_{{item[0]}}" name="qty_cur[]" value="{{item[5]}}" style="background-color:rgba(0, 0, 0, 0);border:0" readonly></td>
+</tr>
+
+{% endfor %}
+</table>    
+<input type='submit'>  
+</form>
+</div>
+<div id="ajax-content"></div>
+</div>
+<!--End Content-->
+</div>
+
+{% endblock %}

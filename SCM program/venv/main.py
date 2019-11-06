@@ -20,7 +20,7 @@ from flask import Flask, render_template,url_for,request,redirect,Blueprint,rend
 from pmdarima.arima import auto_arima
 from . import db
 from .models import User
-
+from . import role
 
 
 
@@ -41,11 +41,8 @@ def index():
    return render_template('index.html')
 
 @main.route('/profile')
-@login_required
+@role('Admin')
 def profile():
-   role=current_user.getRole()   
-   if role!="admin":
-      return redirect(url_for('auth.error'))
    return render_template('profile.html', name=current_user.name)
 
 @main.route('/showGraph',methods = ['GET'])
@@ -208,7 +205,7 @@ def forecast():
    forecast = model.predict(n_periods=4)
    #HERE IS HARDCODE
    forecast = pd.DataFrame(forecast,index = ['2018-12-01','2019-01-01','2019-2-01','2019-3-01'],columns=['Prediction'])
-
+   forecast.to_csv('forecast.csv')
    hover1 = HoverTool(tooltips=[("Sales", "@y")])
    X = ['December','January','February','March']
 
@@ -237,7 +234,7 @@ def confirmRequest():
    cur.execute("select * from v_warehouse_stock where prod_id=? and cur_quantity>0 ",data[0][3])
    data2=cur.fetchall()
    cur.close()
-   con.close()
+
    return render_template('confirmRequest.html',data=data,data2=data2)
    
 @main.route('/showRequest')
@@ -251,3 +248,23 @@ def showRequest():
 
    con.close()
    return render_template('showRequest.html',data=data)
+
+@main.route('/autoResponse')
+@role('Admin')
+def autoResponses():
+   cur = con.cursor()
+   cur.execute("select sum(cur_quantity) from warehouse where prod_id='pr1' group by prod_id ")
+   qtyitem=cur.fetchall()
+   qty_stock=qtyitem[0][0]
+   cur.execute("select * from view_pending where s")
+   data = cur.fetchall()
+   df=pd.read_csv('../forecast.csv',skiprows=1,index_col=False)
+   qty_forecast=int(df.iloc[-1,1])
+
+   qty_request=data[0][5]
+
+   if((qty_stock-qty_forecast)>qty_request):
+      cur.execute("insert into vendor_order values('sk1','"+str(data[0][1])+"',GETDATE(),"+str(data[0][5])+",null,20,'A')")
+      cur.execute("update request set status='A' where request_id='"+data[0][0]+"'")
+   cur.commit()
+   return showRequest()
