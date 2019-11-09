@@ -268,3 +268,51 @@ def autoResponses():
       cur.execute("update request set status='A' where request_id='"+data[0][0]+"'")
    cur.commit()
    return showRequest()
+
+import time
+import atexit
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+
+def monthlyforecast():
+   cur = con.cursor()
+   cur.execute("select distinct(prod_id) from show_sales")
+   data=cur.fetchall()
+   for prod_id in data:
+      SQL_Query = pd.read_sql_query("select * from show_sales where prod_id='"+prod_id[0]+"'", con)
+      df=pd.DataFrame(SQL_Query)
+      df['date'] = pd.to_datetime(df['date'])
+      df=df.drop(['prod_id'], axis=1)
+      df=df.set_index('date')
+
+      y=df
+      y = df['Quantity'].resample('MS').sum()
+      model = auto_arima(y, trace=True, start_p=3, start_q=3, start_P=1, start_Q=5,
+                           max_p=7, max_q=7, max_P=7, max_order=20,max_Q=6,D=1,d=1, m=1,seasonal=True,
+                           stepwise=True, error_action='ignore', suppress_warnings=True)
+      model.fit(y)
+      forecast = model.predict(n_periods=4)
+      date_index=y[-1:].index
+      x_index=[]
+      date_index=date_index+1
+      for i in range(4):
+         x_index.append(str((date_index+i).date[0]))
+      forecast=forecast.round()
+      forecast=forecast.astype(int)
+      d = {'Date': x_index, 'Prediction': forecast}
+      result = pd.DataFrame(data=d)
+      result.insert(loc=0, column='prod_id', value=prod_id[0])
+
+      for index,row in result.iterrows():
+         cur.execute("SET NOCOUNT ON exec prc_insertForecast @prod_id=?,@fdate=?,@no=?",row['prod_id'],row['Date'],row["Prediction"])
+   cur.commit()
+   cur.close()
+
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=monthlyforecast, trigger="cron", day=8)
+scheduler.start()
+
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())

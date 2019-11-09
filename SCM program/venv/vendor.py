@@ -121,8 +121,10 @@ def adjustStocking():
 @role('Vendor')
 def dailyClosing():    
    cur = con.cursor()
-   cur.execute("select * from vendor_sales where date=GETDATE()")
-   if(cur.rowcount==0):
+   cur.execute("select * from vendor_sales where date=cast(getDATE() as date)")
+   data=cur.fetchall()
+
+   if(len(data)>0):
       return "<h1>CLOSING DONE TODAY</h1>"
    cur.execute("select * from v_vendor_stock where cur_quantity>0 and vendor_id='"+current_user.vendorID+"' order by vs_id asc")
    data = cur.fetchall()   
