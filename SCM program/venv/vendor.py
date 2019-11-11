@@ -82,11 +82,8 @@ def showComplete():
 @role("Vendor")
 def showStock():
    if(current_user.vendorID is None):
-      return redirect(url_for('auth.error'))
-
-   
-   
-   #con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
+      return redirect(url_for('auth.error')) 
+ 
 
    cur = con.cursor()
    cur.execute("select * from v_vendor_stock where vendor_id='"+current_user.vendorID+"' order by receive_date asc")

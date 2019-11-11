@@ -1,5 +1,7 @@
-<html>
-<body>
+{% extends "base.html" %}
+
+{% block content %}
+
 
         <form action="http://localhost:5000/vendor/adjustStock" method="POST">
             <div class="container">
@@ -11,46 +13,42 @@
               <table>
                 <tr>
                   <td>
-                      <label for="Product ID"><b>Product ID</b></label>
+                      <label for="pid"><b>Stock_ID</b></label>
                   </td>
                   <td>
-                      <label for="Product ID"><b>Product Name</b></label>
+                      <label for="pname"><b>Product Name</b></label>
                   </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" value='{{data[0][3]}}' name="pid" readonly >
+                        <input type="text" value='{{data[0][0]}}' name="vs_id" readonly >
                     </td>
                     <td>
-                        <input type="text" value='{{data[0][4]}}' name="pname" readonly >
+                        <input type="text" value='{{data[0][1]}}' name="pname" readonly >
                     </td>
                   </tr>
                   <tr>
-                      <td>
-                          <label for="Vendor ID"><b>Vendor ID</b></label>
-                      </td>
-                      <td>
-                          <label for="Vendor Name"><b>Vendor Name</b></label>
-                      </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="text"  value='{{data[0][1]}}' name="vid" readonly>
-                        </td>
-                        <td>
-                            <input type="text"  value='{{data[0][2]}}' name="vname" readonly >
-                        </td>
-                      </tr>
+                        <tr>
+                            <td>
+                                <label for="cur_qty"><b>Current Quantity</b></label>
+                            </td>
+                            <td>
+                                    <label for="init_qty"><b>Initial Quantity</b></label>
+                            </td>
+                         </tr>
+                    <td>
+                        <input type="text" value='{{data[0][5]}}' name="cur_qty" readonly >
+                    </td>
+                    <td>
+                        <input type="text" value='{{data[0][6]}}' name="inti_qty" readonly >
+                    </td>
+                  </tr>
               </table>
             
               
              
           
-              <label for="Quantity"><b>Quantity</b></label>
-              <input type="text" value={{data[0][5]}} name="qty">
-          
-              <label for="Request_price"><b>Price</b></label>
-              <input type="text" value={{data[0][6]}} name="price" >
+              
 
           
               <hr>
@@ -63,7 +61,4 @@
           
           </form>
           
-</body>
-
-
-</html>
+    {% endblock %}

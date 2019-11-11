@@ -3,8 +3,17 @@
 {% block content %}
 
 			<div class="preloader">
-                <h1>Forecast Sales For 2019</h1>
-    
+
+                <h1>Forecast Sales Next 4 month</h1>
+                <form method="GET" action="#">
+                        <select id='ftype' name='pid' style="width:50%"> 
+                                {% for item in data %}
+                                <option value='{{item[0]}}'>{{item[1]}}</option>
+                                
+                                {% endfor %}
+                        </select>
+                <input type="submit" value="Forecast">
+                </form>
             
                 {{ the_div|safe }}
                 <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-1.3.4.min.js"></script>

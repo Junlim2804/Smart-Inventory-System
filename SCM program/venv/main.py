@@ -46,7 +46,7 @@ def profile():
    return render_template('profile.html', name=current_user.name)
 
 @main.route('/showGraph',methods = ['GET'])
-@login_required
+@role('Admin')
 def showGraph():
    
    cur = con.cursor()
@@ -95,21 +95,21 @@ def showGraph():
                            the_div=div, the_script=script,product=product,year=year)
 
 @main.route('/showStock')
-@login_required
+@role('Admin')
 def showStock():
-   con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
-
    cur = con.cursor()
-   cur.execute("select * from v_warehouse_stock order by date_received asc")
+   cur.execute("select * from v_warehouse_stock order by prod_id,date_received asc")
    data = cur.fetchall()
+   cur.execute("select prod_id,prod_name,sum(cur_quantity) as 'Total Quantity' from v_warehouse_stock group by prod_id,prod_name order by prod_id" )
+   product=cur.fetchall()
    cur.close()
-   con.close()
-   return render_template('showStock.html',data=data)
+
+   return render_template('showStock.html',data=data,data1=product)
 
 
 
 @main.route('/showVendorRequest')
-@login_required
+@role('Admin')
 def showVendorRequest():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
@@ -121,7 +121,7 @@ def showVendorRequest():
    return render_template('showStock.html',data=data)
 
 @main.route('/addstock')
-@login_required
+@role('Admin')
 def addStock():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
    cur = con.cursor()
@@ -134,7 +134,7 @@ def addStock():
    con.close()
    return render_template('addStock.html',data=data,seq=seq)
 @main.route('/addingstock',methods = ['POST'])
-@login_required
+@role('Admin')
 def addingStock():
    #Stock_ID=request.form['sid']
    Supplier_ID=request.form['sup_id']
@@ -161,7 +161,7 @@ def addingStock():
       
 
 @main.route('/addOrder',methods=['POST'])
-@login_required
+@role('Admin')
 def addOrder():
    
    rid=request.form['rid']
@@ -173,55 +173,49 @@ def addOrder():
    return render_template('addOrder.html',data=data) 
    
 @main.route('/PlaceOrder',methods=['POST'])
-@login_required
+@role('Admin')
 def placeOrder():
    a=request.form['sdate']
    return a
 
 @main.route('/home')
-@login_required
+@role('Admin')
 def home():
    return render_template('index.html')
 
 @main.route('/forecast')
-@login_required
+@role('Admin')
 def forecast():   
-   SQL_Query = pd.read_sql_query("select * from show_sales where prod_id='pr1'", con)
-   df=pd.DataFrame(SQL_Query)
-   df['date'] = pd.to_datetime(df['date'])
-   df=df.drop(['prod_id'], axis=1)
-   df=df.set_index('date')
-   y=df
-   y = df['Quantity'].resample('MS').sum()
-   train=y[0:-2]
-   valid=y[-12:]
 
-
-   model = auto_arima(y[:-1], trace=True, start_p=3, start_q=3, start_P=1, start_Q=5,
-                        max_p=7, max_q=7, max_P=7, max_order=20,max_Q=6,D=1,d=1, m=1,seasonal=True,
-                        stepwise=True, error_action='ignore', suppress_warnings=True)
-   model.fit(y[:-1])
-
-   forecast = model.predict(n_periods=4)
-   #HERE IS HARDCODE
-   forecast = pd.DataFrame(forecast,index = ['2018-12-01','2019-01-01','2019-2-01','2019-3-01'],columns=['Prediction'])
-   forecast.to_csv('forecast.csv')
+   #con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
+   pid = request.args.get("pid")
+   if pid ==None:
+      pid='pr1'
+   
+   cur=con.cursor()
+   cur.execute("select * from product")
+   product=cur.fetchall()
+   cur.execute("select format([date], 'MMMMyyyy'),Prediction from forecast where prod_id='"+pid+"' and [date]>getdate()")
+   data=cur.fetchall()
    hover1 = HoverTool(tooltips=[("Sales", "@y")])
-   X = ['December','January','February','March']
+   X=[]
+   Y=[]
+   for i in data:
+      X.append(i[0])
+      Y.append(i[1])
 
-   Y = y.iloc[-1:].values
-   Y= np.concatenate((Y, forecast['Prediction'].iloc[-3:].values))
-
+   #Y = y.iloc[-1:].values
    p = figure(x_range=X, plot_height=400,x_axis_label='Month',x_minor_ticks=1,
             title="Forecast Sales",toolbar_location=None, tools=[hover1])
-   #barchart.vbar(x=X, top=Y, width=0.2)
+
    p.line(y=Y,x=X,line_width=2)
+ 
    
-   p.y_range.start =0
+   p.y_range.start =2000
    script, div = components(p)
-   return render_template('showForecast.html',the_div=div, the_script=script)
+   return render_template('showForecast.html',the_div=div, the_script=script,data=product)
 @main.route('/confirmRequest')
-@login_required
+@role('Admin')
 def confirmRequest():
    request_id=request.args.get('rid')
    if(request_id==None):
@@ -238,7 +232,7 @@ def confirmRequest():
    return render_template('confirmRequest.html',data=data,data2=data2)
    
 @main.route('/showRequest')
-@login_required
+@role('Admin')
 def showRequest():
    con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
