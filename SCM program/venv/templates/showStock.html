@@ -28,7 +28,7 @@
 					$( "."+this.id ).css( "display", "none" );
     				});     
 				</script>
-				<table style='border:1;width:100%;'>
+				<table style='border:1;width:100%;' id="normal">
 				{% for i in data1 %}
 		
 					
@@ -81,23 +81,40 @@
 
 	  
 	  {% endfor %}
-	</table>
-<table style='border:1;display:none;width:100%' id='empty' >
-        <tr>
-          <th>Stock ID</th>
-          <th>Product ID</th>
-          <th>Date Receive</th>
-          <th>Condition</th>
-          <th>Price Per Unit</th>
-          <th>Current Quantity</th>
-          <th>Total Quantity</th>
+	  <table style='border:1;width:100%;display:none' id="empty">
+		{% for i in data1 %}
+
+			
+		
+		
+		<tr class='rows' id="{{i[0]}}">
+		<th>Product ID</td>		
+		<th>{{i[0]}}</td>
+		<th>Product Name</td>	
+		<th colspan="2">{{i[1]}}</td>
+		<th>Total Quantity </td>	
+		<th >{{i[2]}}</td>
 		</tr>
+
+	  
 	
 
+	
+	  <tr class="{{i[0]}}" style="display:none;border-top:4pt solid black;" >
+		<th>Stock ID</th>
+		<th>Product Name</th>
+		<th>Date Receive</th>
+		<th>Condition</th>
+		<th>Price Per Unit</th>
+		<th>Init Quantity</th>
+		<th>Current Quantity</th>
+	  </tr>
+  
+
 		{% for item in data %}
-	  
-	  
-		<tr >
+		{% if (item[7]==i[0])%}
+
+		<tr class="{{i[0]}}" style="display:none">
 		<td>{{item[0]}}</td>
 		<td>{{item[1]}}</td>
 		<td>{{item[2]}}</td>
@@ -108,8 +125,15 @@
 		</tr>
 
 
-{% endfor %}
-</table>      
+		{% endif %}	
+		
+		{% endfor %}
+		<tr class="{{i[0]}}" style="display:none;border-top:4pt solid black;">	
+			<td colspan="7"> </td>
+		</tr>
+
+
+		{% endfor %}    
  
 			</div>
 			<div id="ajax-content"></div>

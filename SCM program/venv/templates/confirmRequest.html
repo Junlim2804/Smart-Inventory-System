@@ -3,9 +3,86 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
-  function selected(x) {
-    document.getElementById('selected_stock').value = x
+  var table1;
+  var cell1;
+  var cell2;
+  var cell3;
+  var cell4;
+  var cell5;
+  var cell6;
+  var table2;
+  var i;
+  var item_list=[]
+  function Item(sid, qty,cost) {
+    this.sid = sid;
+    this.qty = qty; 
+    this.cost=cost;
+  }
+
+  function selected(x) {  
+ 
+  table1=document.getElementById("stock");
+  table2 = document.getElementById("selected");
+  
+  i=x.parentNode.parentNode.rowIndex;
+  document.getElementById('id01').style.display='block';  
+
 }
+
+
+function confirm()
+{
+  var numberInput=document.getElementById("user_qty").value;
+  document.getElementById('id01').style.display='none';
+  var newRow = table2.insertRow(-1),
+  cell1 = newRow.insertCell(0);
+  cell2 = newRow.insertCell(1);
+  cell3 = newRow.insertCell(2);
+  cell4 = newRow.insertCell(3);
+  cell5 = newRow.insertCell(4);
+  cell6 = newRow.insertCell(5);
+  cell1.innerHTML =' <input type="button" value="Delete" onclick="delete_item(this)" >';  
+  cell2.innerHTML = table1.rows[i].cells[1].innerHTML;
+  cell3.innerHTML = table1.rows[i].cells[2].innerHTML;
+  cell4.innerHTML = table1.rows[i].cells[3].innerHTML;
+  cell5.innerHTML = table1.rows[i].cells[4].innerHTML;
+  cell6.id="qty_"+table1.rows[i].cells[1].innerHTML;
+  cell6.innerHTML = numberInput;
+  table1.rows[i].cells[5].innerHTML=table1.rows[i].cells[5].innerHTML-numberInput;
+  item=new Item(cell2.innerHTML,cell6.innerHTML,cell5.innerHTML);
+  item_list.push(item);
+  sessionStorage.setItem('stock_list', JSON.stringify(item_list));
+  table1.rows[i].cells[0].innerHTML=' <input type="button" id="btn_'+table1.rows[i].cells[1].innerHTML+'" onclick="selected(this)" disabled value="Selected"> '
+  
+
+}
+
+function delete_item(p)
+{
+	var p=p.parentNode.parentNode;
+	table2 = document.getElementById("selected");	
+	d=p.rowIndex;
+	del=table2.rows[d].cells[1].innerHTML;
+	for(c=0;c<item_list.length;c++)
+	{
+		if(item_list[c].sid==del)
+		{
+			console.log(item_list[c])
+			item_list.splice(c,1);	
+		}
+	}
+	sessionStorage.setItem('stock_list', JSON.stringify(item_list));
+
+    p.parentNode.removeChild(p);
+	btn_id="btn_"+del;
+	console.log(btn_id)
+	document.getElementById(btn_id).removeAttribute("disabled");
+	document.getElementById(btn_id).value="Select";
+}	
+	
+	
+
+
 </script>
 <style>
 body {
@@ -71,11 +148,29 @@ a {
   background-color: #f1f1f1;
   text-align: center;
 }
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  top: 0;  
+  left: 0;
+  right:0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  padding-top: 200px;
+  padding-left: 200px;
+  padding-right: 200px;
+
+}
 </style>
 </head>
-<body style="width:50%">
+<body style="width:50%" >
 
-<form action="http://localhost:5000/addOrder" method="POST">
+<form id="requestForm" action="{{ url_for('main.addOrder') }}" method="POST">
   <div class="container">
     <h1>Confirm Request({{data[0][0]}})</h1>
     <h3>Request At {{data[0][7]}}</h3>
@@ -125,7 +220,7 @@ a {
 
     <label for="Request_price"><b>Price</b></label>
     <input type="text" value={{data[0][6]}} name="price" >
-    <table style='border:1px solid black;border-collapse: collapse;text-align: center;width:100%;box-sizing: border-box;'>
+    <table id="stock" style='border:1px solid black;border-collapse: collapse;text-align: center;width:100%;box-sizing: border-box;'>
         <tr style='background-color: grey'>  
           <th></th>
           <th>Stock ID</th>
@@ -137,8 +232,8 @@ a {
       {% for item in data2 %}
       
       <tr style='border:1px solid black;'>
-        <td><button type="button" onclick="selected('{{item[1]}}')">Select</button></td>      
-        <td>{{item[1]}}</td>
+        <td><input type="button" onclick="selected(this)" value="Select"></td>      
+        <td>{{item[0]}}</td>
         <td>{{item[2]}}</td>
         <td>{{item[3]}}</td>
         <td>{{item[4]}}</td>
@@ -147,9 +242,35 @@ a {
       </tr>
 
       {% endfor %}
+      <div id="id01" class="modal">
+  
+        
+          <div class="imgcontainer">
+            <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+           
+          </div>
+      
+          <div class="container" style="align-content: center;">            
+      
+            <label for="user_qty"><b>Please insert in Quantity</b></label>
+            <input type="number" id="user_qty" name="user_qty" required>
+              
+            <input type="button" value="Confirm" onclick='confirm()'>
+            <input type="button" value="Cancel" onclick="document.getElementById('id01').style.display='none'">
+          </div>
+	
       </table>
       <label for="Stock_ID"><b>Stock Selected</b></label>
-      <input type="text" id='selected_stock' placeholder="Choose From Table" name="sid" readonly >
+      <table id="selected" style='border:1px solid black;border-collapse: collapse;text-align: center;width:100%;box-sizing: border-box;'' >
+        <tr style='background-color: grey'>  
+              <th></th>
+              <th>Stock ID</th>
+              <th>Date Receive</th>
+              <th>Condition</th>
+              <th>Price Per Unit</th>   
+              <th>Quantity</th>
+       </tr>
+      </table>
 
     <hr>
 

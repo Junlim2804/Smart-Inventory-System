@@ -18,17 +18,7 @@
            document.getElementById("empty").style.display="none";
        }}
 
-      $(document).on("click","tr.rows", function(e){
-                var a = $(this).closest('tr').find('td:first').text();
-                          
-                var url = "{{ url_for('vendor.adjustStock') }}"
-                var form = $('<form action="' + url + '" method="get">' +
-                '<input type="text" name="vs_id" value="' + a + '" />' +
-                '</form>');
-                $('body').append(form);
-                form.submit();
-            
-    });     
+      
    </script>
    
 <table style='border:1;width:100%;padding: 8px' id='normal'>

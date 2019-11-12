@@ -162,16 +162,27 @@ def addingStock():
 
 @main.route('/addOrder',methods=['POST'])
 @role('Admin')
-def addOrder():
-   
+def addOrder():  
    rid=request.form['rid']
-   sid=request.form['sid']
+   #sid=request.form['sid']
    vid=request.form['vid']
-   qty=request.form['qty']
-   price=request.form['price']
-   data=[rid,sid,vid,qty,price]
-   return render_template('addOrder.html',data=data) 
+   #qty=request.form['qty']
+   #price=request.form['price']
    
+   
+   return render_template('addOrder.html',data=rid,data1=vid) 
+
+@main.route('/addOrder')
+@role('Admin')
+def testingonly():  
+   rid='R52'
+   #sid=request.form['sid']
+   vid='V180101001'
+   #qty=request.form['qty']
+   #price=request.form['price']
+   
+   
+   return render_template('addOrder.html',data=rid,data1=vid)   
 @main.route('/PlaceOrder',methods=['POST'])
 @role('Admin')
 def placeOrder():
@@ -220,7 +231,6 @@ def confirmRequest():
    request_id=request.args.get('rid')
    if(request_id==None):
       return showRequest()
-   con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
    cur = con.cursor()
    cur.execute("select * from view_pending where request_id='"+request_id+"'")

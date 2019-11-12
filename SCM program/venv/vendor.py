@@ -98,21 +98,6 @@ def errorMessage():
     flash(messages)
     return render_template("errorMessage.html")
 
-@vendor.route('/vendor/adjustStock',methods=['GET'])
-@role("Vendor")
-def adjustStock():   
-   vs_id=request.args.get('vs_id')
-   cur = con.cursor()
-   cur.execute("select * from v_vendor_stock where vs_id='"+vs_id+"'")
-   data = cur.fetchall()
-   return render_template('vendor/adjustStock.html',data=data)   
-
-@vendor.route('/vendor/adjustStock',methods=['POST'])
-@role("Vendor")
-def adjustStocking():   
-   #vs_id=request.form['vs_id']
-   qty=request.form['qty']
-   return qty  
 
 @vendor.route('/vendor/dailyClosing')
 @role('Vendor')

@@ -8,7 +8,12 @@ body {
   background-color: black;
   margin-left: 30%
 }
-
+table {
+  border-collapse: collapse;
+}
+table td {
+  border: 2px solid black; 
+}
 * {
   box-sizing: border-box;
 }
@@ -20,7 +25,7 @@ body {
 }
 
 /* Full-width input fields */
-input[type=text], input[type=password] {
+input[type=text], input[type=password] ,input[type=number]{
   width: 100%;
   padding: 15px;
   margin: 5px 0 22px 0;
@@ -72,25 +77,36 @@ a {
 
 <form action="http://localhost:5000/PlaceOrder" method="POST">
   <div class="container">
-    <h1>Add Order</h1>
-    {{data}}
+    <h1>Invoice Summary</h1>
+
     <hr>
     <label for="Request ID"><b>Request ID</b></label>
-    <input type="text" placeholder="Enter Request ID" value='{{data[0]}}' name="rid" required readonly>
-    <label for="Stock ID"><b>Stock ID</b></label>
-    <input type="text" placeholder="Enter StockID" value='{{data[1]}}' name="sid" required readonly> 
+    <input type="text" placeholder="Enter Request ID" value='{{data}}' name="rid" required readonly>
+
 
     <label for="Vendor ID"><b>VendorID</b></label>
-    <input type="text" placeholder="Enter VendorID" value='{{data[2]}}' name="vid" required readonly>
+    <input type="text" placeholder="Enter VendorID" value='{{data1}}' name="vid" required readonly>
 
-    <label for="Quantity"><b>Quantity</b></label>
-    <input type="text" placeholder="Enter Quantity" value='{{data[3]}}' name="qty" required>
+    <table id="selected" style='border:1px solid black;text-align: center;width:100%;' >
+      <thead>
+        <tr style='background-color: grey'>  
+          
+          <th>Stock ID</th>
+            
+          <th>Quantity</th>
+          <th>Cost Price</th>
+          <th>Total Cost</th>
+    </thead>
+   <tbody>
+    </tbody>
+
+    </table>
 
     <label for="Send Date"><b>Send Date</b></label>
     <input type="datetime-local" placeholder="Enter date in yyyy-MM-dd hh:mm" name="sdate" required>
-    </br>
+    </br></br></br>
     <label for="Sell price"><b>Sell price</b></label>
-    <input type="text" placeholder="100.00" name="price" value='{{data[4]}}' required>  
+    <input type="number" placeholder="100.00" name="price" min=1 required>  
 
 
     <hr>
@@ -103,4 +119,43 @@ a {
 </form>
 
 </body>
+<script>
+	stock_list = JSON.parse(sessionStorage.getItem('stock_list')); 
+  var table = document.getElementById("selected");
+  window.onload=loading();
+  function loading(){
+    var totalqty=0.0,totalcost=0.0,finalCost=0.0;
+	  table = document.getElementById("selected");
+    var item=stock_list.pop();
+    while(item!=null)
+    {
+    var newRow = table.insertRow(-1);
+    var cell1 = newRow.insertCell(0);
+    var cell2 = newRow.insertCell(1);
+    var cell3 = newRow.insertCell(2);
+    var cell4 = newRow.insertCell(3);
+    cell1.innerHTML =item.sid;  
+    cell2.innerHTML = item.qty;
+    cell3.innerHTML = item.cost;
+    cell4.innerHTML=(item.qty*item.cost).toFixed(2);
+    totalqty+=parseFloat(item.qty);
+    totalcost+=parseFloat(item.cost);
+    finalCost+=parseFloat(cell4.innerHTML);
+    item=stock_list.pop();
+    }
+
+    var newRow = table.insertRow(-1);
+    var cell1 = newRow.insertCell(0);
+    var cell2 = newRow.insertCell(1);
+    var cell3 = newRow.insertCell(2);
+    var cell4 = newRow.insertCell(3);
+    cell1.innerHTML ="";  
+    cell2.innerHTML =totalqty;
+    cell3.innerHTML =totalcost.toFixed(2);
+    cell4.innerHTML =finalCost.toFixed(2);
+    
+  
+  }
+    
+</script>
 </html>
