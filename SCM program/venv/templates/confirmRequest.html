@@ -30,9 +30,22 @@
 }
 
 
-function confirm()
+function confirmation()
 {
   var numberInput=document.getElementById("user_qty").value;
+  var oriqty=table1.rows[i].cells[5]
+  numberInput=parseInt(numberInput,10)
+  var ori_quantity=parseInt(oriqty.innerHTML,10)
+  
+  console.log("ori:"+oriqty.innerHTML)
+  console.log(i)
+  console.log("input:"+numberInput)
+  if(ori_quantity<numberInput)
+  {
+    alert('Stock cannot over original quantity');
+
+    return false;
+  }
   document.getElementById('id01').style.display='none';
   var newRow = table2.insertRow(-1),
   cell1 = newRow.insertCell(0);
@@ -48,7 +61,7 @@ function confirm()
   cell5.innerHTML = table1.rows[i].cells[4].innerHTML;
   cell6.id="qty_"+table1.rows[i].cells[1].innerHTML;
   cell6.innerHTML = numberInput;
-  table1.rows[i].cells[5].innerHTML=table1.rows[i].cells[5].innerHTML-numberInput;
+  oriqty.innerHTML=ori_quantity-numberInput;
   item=new Item(cell2.innerHTML,cell6.innerHTML,cell5.innerHTML);
   item_list.push(item);
   sessionStorage.setItem('stock_list', JSON.stringify(item_list));
@@ -80,7 +93,16 @@ function delete_item(p)
 	document.getElementById(btn_id).value="Select";
 }	
 	
-	
+function reject()
+{
+  if (confirm('Confirm Reject???')) {
+         sessionStorage.setItem('stock_list', JSON.stringify([]));
+         document.getElementById('requestForm').action="{{url_for('main.reject') }}"
+         document.getElementById('requestForm').submit();
+       } else {
+           return false;
+       }
+}	
 
 
 </script>
@@ -253,9 +275,9 @@ a {
           <div class="container" style="align-content: center;">            
       
             <label for="user_qty"><b>Please insert in Quantity</b></label>
-            <input type="number" id="user_qty" name="user_qty" required>
+            <input type="number" min=1 id="user_qty" name="user_qty" required>
               
-            <input type="button" value="Confirm" onclick='confirm()'>
+            <input type="button" value="Confirm" onclick='confirmation()'>
             <input type="button" value="Cancel" onclick="document.getElementById('id01').style.display='none'">
           </div>
 	
@@ -276,7 +298,7 @@ a {
 
       
 
-    <button type="submit" class="registerbtn">Accept</button><button type="submit" style="background-color: red" class="registerbtn">Reject</button>
+    <button type="submit" class="registerbtn">Accept</button><button onclick="reject()" style="background-color: red" class="registerbtn">Reject</button>
   </div>
   
 

@@ -101,13 +101,16 @@ a {
     </tbody>
 
     </table>
-
-    <label for="Send Date"><b>Send Date</b></label>
+    
+    <label for="sdate"><b>Send Date</b></label>
     <input type="datetime-local" placeholder="Enter date in yyyy-MM-dd hh:mm" name="sdate" required>
     </br></br></br>
-    <label for="Sell price"><b>Sell price</b></label>
-    <input type="number" placeholder="100.00" name="price" min=1 required>  
-
+    <label for="qty"><b>Total Quantity</b></label>
+    <input type="number" id='total_quantity' min=1 read-only>  
+    <label for="price"><b>Sell price</b></label>
+    <input type="number" placeholder="100.00" name="price" id="price" min=1 required onchange="priceChange()">  
+    <label for="uprice"><b>Unit price</b></label>
+    <input type="number" placeholder="100.00" id="uprice" name="uprice" min=1 readonly>  
 
     <hr>
    
@@ -122,7 +125,9 @@ a {
 <script>
 	stock_list = JSON.parse(sessionStorage.getItem('stock_list')); 
   var table = document.getElementById("selected");
+  
   window.onload=loading();
+
   function loading(){
     var totalqty=0.0,totalcost=0.0,finalCost=0.0;
 	  table = document.getElementById("selected");
@@ -134,8 +139,8 @@ a {
     var cell2 = newRow.insertCell(1);
     var cell3 = newRow.insertCell(2);
     var cell4 = newRow.insertCell(3);
-    cell1.innerHTML =item.sid;  
-    cell2.innerHTML = item.qty;
+    cell1.innerHTML =item.sid+"<input type='hidden' value='"+item.sid+"'' name=sid[]> ";  
+    cell2.innerHTML = item.qty+"<input type='hidden' value='"+item.qty+"'' name=qty[]> ";  
     cell3.innerHTML = item.cost;
     cell4.innerHTML=(item.qty*item.cost).toFixed(2);
     totalqty+=parseFloat(item.qty);
@@ -151,11 +156,20 @@ a {
     var cell4 = newRow.insertCell(3);
     cell1.innerHTML ="";  
     cell2.innerHTML =totalqty;
-    cell3.innerHTML =totalcost.toFixed(2);
+    
     cell4.innerHTML =finalCost.toFixed(2);
+    document.getElementById("total_quantity").value=totalqty;
     
   
   }
+
+  function priceChange()
+  {
+    var sellprice=document.getElementById("price").value
+    var totalqty=document.getElementById("total_quantity").value
+    document.getElementById("uprice").value=(parseFloat(sellprice)/totalqty).toFixed(2)
+  }
+
     
 </script>
 </html>

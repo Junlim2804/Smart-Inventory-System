@@ -186,9 +186,25 @@ def testingonly():
 @main.route('/PlaceOrder',methods=['POST'])
 @role('Admin')
 def placeOrder():
-   a=request.form['sdate']
-   return a
+   from datetime import datetime
+   rid=request.form['rid']
+   vid=request.form['vid']
+   sdate=request.form['sdate']
+   price=request.form['price']
+   sid_list=request.form.getlist('sid[]')
+   qty_list=request.form.getlist('qty[]')
+   cur=con.cursor()
+   sdate=sdate.replace("T"," ")
 
+   try:
+      for i in range(len(sid_list)):
+         cur.execute("insert into vendor_order(Stock_id,Vendor_id,send_date,quantity,sell_price,request_id) values (?,?,?,?,?,?)",
+         sid_list[i],vid,sdate,qty_list[i],price,rid)
+   except Exception as e:
+      cur.close()
+      return str(e)
+   cur.commit()
+   return "<script>sessionStorage.setItem('stock_list', JSON.stringify([]));</script><h1>sucess</h1>"
 @main.route('/home')
 @role('Admin')
 def home():
@@ -240,7 +256,12 @@ def confirmRequest():
    cur.close()
 
    return render_template('confirmRequest.html',data=data,data2=data2)
-   
+
+@main.route('/reject',methods=['POST'])
+@role('Admin')
+def reject():
+   rid=request.form['rid']
+   return rid
 @main.route('/showRequest')
 @role('Admin')
 def showRequest():
