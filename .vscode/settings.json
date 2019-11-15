@@ -1,9 +1,0 @@
-{
-    "python.pythonPath": "C:\\Users\\magic\\Anaconda3\\envs\\pmdarima\\python.exe",
-    "files.exclude": {
-        "**/.classpath": true,
-        "**/.project": true,
-        "**/.settings": true,
-        "**/.factorypath": true
-    }
-}
