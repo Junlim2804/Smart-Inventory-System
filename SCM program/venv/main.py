@@ -117,7 +117,7 @@ def showVendorRequest():
    cur.execute("select * from request")
    data = cur.fetchall()
    cur.close()
-   con.close()
+   
    return render_template('showStock.html',data=data)
 
 @main.route('/addstock')
@@ -131,7 +131,7 @@ def addStock():
    seq=cur.fetchval()
    seq='sk'+str(seq+1)
    cur.close()
-   con.close()
+   
    return render_template('addStock.html',data=data,seq=seq)
 @main.route('/addingstock',methods = ['POST'])
 @role('Admin')
@@ -172,17 +172,7 @@ def addOrder():
    
    return render_template('addOrder.html',data=rid,data1=vid) 
 
-@main.route('/addOrder')
-@role('Admin')
-def testingonly():  
-   rid='R52'
-   #sid=request.form['sid']
-   vid='V180101001'
-   #qty=request.form['qty']
-   #price=request.form['price']
-   
-   
-   return render_template('addOrder.html',data=rid,data1=vid)   
+
 @main.route('/PlaceOrder',methods=['POST'])
 @role('Admin')
 def placeOrder():
@@ -198,10 +188,11 @@ def placeOrder():
 
    try:
       for i in range(len(sid_list)):
-         cur.execute("insert into vendor_order(Stock_id,Vendor_id,send_date,quantity,sell_price,request_id) values (?,?,?,?,?,?)",
+         cur.execute("insert into vendor_order(Stock_id,Vendor_id,send_date,quantity,request_id) values (?,?,?,?,?)",
          sid_list[i],vid,sdate,qty_list[i],price,rid)
+         cur.execute("update request set sell_pirce=? where request_id=?",price,rid)
    except Exception as e:
-      cur.close()
+      cur.close() 
       return str(e)
    cur.commit()
    return "<script>sessionStorage.setItem('stock_list', JSON.stringify([]));</script><h1>sucess</h1>"
@@ -212,9 +203,7 @@ def home():
 
 @main.route('/forecast')
 @role('Admin')
-def forecast():   
-
-   #con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
+def forecast(): 
    pid = request.args.get("pid")
    if pid ==None:
       pid='pr1'
@@ -230,8 +219,7 @@ def forecast():
    for i in data:
       X.append(i[0])
       Y.append(i[1])
-
-   #Y = y.iloc[-1:].values
+  
    p = figure(x_range=X, plot_height=400,x_axis_label='Month',x_minor_ticks=1,
             title="Forecast Sales",toolbar_location=None, tools=[hover1])
 
@@ -261,17 +249,33 @@ def confirmRequest():
 @role('Admin')
 def reject():
    rid=request.form['rid']
-   return rid
+   cur=con.cursor()
+   try:      
+      cur.execute("Update request set status='R' where request_id=?",rid)
+   except Exception as e:
+      cur.close()
+      return str(e)
+   cur.commit()         
+   cur.close()
+   return "SUCESSFUL REJECT" 
+    
 @main.route('/showRequest')
 @role('Admin')
-def showRequest():
-   con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
+def showAllRequest():   
+   cur = con.cursor()
+   cur.execute("select * from v_requesthistory where status!='P'")
+   data = cur.fetchall()   
 
+   cur.close()
+   return render_template('requestHistory.html',data=data)
+
+@role('Admin')
+def showRequest():
    cur = con.cursor()
    cur.execute("select * from view_pending")
    data = cur.fetchall()   
 
-   con.close()
+   cur.close()
    return render_template('showRequest.html',data=data)
 
 @main.route('/autoResponse')
@@ -289,7 +293,7 @@ def autoResponses():
    qty_request=data[0][5]
 
    if((qty_stock-qty_forecast)>qty_request):
-      cur.execute("insert into vendor_order values('sk1','"+str(data[0][1])+"',GETDATE(),"+str(data[0][5])+",null,20,'A')")
+      cur.execute("insert into vendor_order values('sk1','"+str(data[0][1])+"',GETDATE(),"+str(data[0][5])+",null,'A')")
       cur.execute("update request set status='A' where request_id='"+data[0][0]+"'")
    cur.commit()
    return showRequest()

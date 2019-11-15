@@ -159,12 +159,13 @@
 					<a href="http://localhost:5000/confirmRequest" class="dropdown-toggle">
 						
 						 <span class="hidden-xs">Confirm Request</span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a class="ajax-link" href="ajax/tables_simple.html">Simple Tables</a></li>
-						<li><a class="ajax-link" href="ajax/tables_datatables.html">Data Tables</a></li>
-						<li><a class="ajax-link" href="ajax/tables_beauty.html">Beauty Tables</a></li>
-					</ul>
+					</a>					
+				</li>
+				<li class="dropdown">
+					<a href="{{ url_for('main.showAllRequest') }}" class="dropdown-toggle">
+						
+						 <span class="hidden-xs">Request History</span>
+					</a>					
 				</li>
 				<li class="dropdown">
 					<a href="http://localhost:5000/forecast" class="dropdown-toggle">						

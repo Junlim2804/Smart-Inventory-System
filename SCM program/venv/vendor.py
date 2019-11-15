@@ -190,3 +190,90 @@ def showGraph():
    #script2, div2 = components(p)
    return render_template("showGraph.html", bars_count=1,
                            the_div=div, the_script=script,product=product,year=year)
+
+
+   
+@vendor.route('/vendor/showAllRequest')
+@role('Vendor')
+def showRequestHistory():
+   cur = con.cursor()
+   if(current_user.vendorID is None):
+      return redirect(url_for('auth.error'))
+   cur.execute("select * from v_requesthistory where vendor_id=?",current_user.vendorID)
+   data = cur.fetchall()   
+
+   cur.close()
+   return render_template('vendor/showPurchaseOrder.html',data=data)
+
+@vendor.route('/vendor/showPending')
+@role('Vendor')
+def showPending():
+   cur = con.cursor()
+   if(current_user.vendorID is None):
+      return redirect(url_for('auth.error'))
+   cur.execute("select * from v_requesthistory where status='A' and vendor_id=?",current_user.vendorID)
+   data = cur.fetchall()   
+
+   cur.close()
+   return render_template('vendor/showPurchaseOrder.html',data=data)
+
+@vendor.route('/vendor/deliveryOrder')
+@role('Vendor')
+def deliveryOrder():
+   
+   cur = con.cursor()
+   cur.execute("select * from view_pending")
+   data = cur.fetchall()   
+
+   cur.close()
+   return render_template('vendor/showPurchaseOrder.html',data=data,data2=data)
+
+@vendor.route('/vendor/confirmDO')
+@role('Vendor')
+def confirmDO():
+   request_id=request.args.get('rid')   
+   cur = con.cursor()
+   cur.execute("select * from v_deliveryOrder where request_id='"+request_id+"'")
+   data = cur.fetchall()
+   cur.execute("select Stock_id,Send_date,Quantity from vendor_order where request_id=?",request_id)
+   data2=cur.fetchall()
+
+   cur.close()
+
+   
+   return render_template('vendor/confirmDelivery.html',data=data,data2=data2)
+
+@vendor.route('/vendor/addStore',methods=['POST'])
+@role('Vendor')
+def addStore():
+   rid=request.form['rid']
+   vid=request.form['vid']
+   sdate=request.form['sdate']   
+   price=request.form['uprice']
+   sid_list=request.form.getlist('sid[]')
+   qty_list=request.form.getlist('qty[]')
+   #next value for seq_request
+ 
+   cur=con.cursor()
+   try:
+      for i in range(len(sid_list)):
+         print(vid)
+         print(sid_list[i])
+         print(sdate)
+         cur.execute("insert into vendor_store(vs_id,vendor_id,stock_id,send_date,init_quantity,cur_quantity,cost_price) values (next value for seq_vendorstore,?,?,?,?,?,?)"
+         ,vid,sid_list[i],sdate,qty_list[i],qty_list[i],price)
+         
+   except Exception as e:    
+        
+      cur.close() 
+      return str(e)
+   cur.commit()
+   cur.close()
+   return "Sucess"
+   #cur=con.cursor()
+   #cur.execute("")
+   #cur.close()
+   
+
+
+

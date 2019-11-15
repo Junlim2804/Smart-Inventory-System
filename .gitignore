@@ -1,7 +1,8 @@
 .ipynb_checkpoints
-.TRASH
+TRASH
 .vscode
 .dist
 .__pycache__/calander.cpython-37.pyc
+.__pycache__
 
 
