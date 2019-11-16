@@ -58,11 +58,10 @@ def addRequest():
    qty=request.form['qty']
    price=request.form['price']
    
-   #con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
    cur=con.cursor()
    try:
-      cur.execute("insert into request values(CONCAT('R',next value for seq_request),?,?,?,?,getdate(),'P')",(vid,pid,price,qty))
+      cur.execute("insert into request values(CONCAT('R',next value for seq_request),?,?,?,?,getdate(),'P',null)",(vid,pid,price,qty))
       #insert into request values(next value for seq_request,'v1',100,10,getdate())
       con.commit()
       if(cur.rowcount):

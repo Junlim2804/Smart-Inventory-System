@@ -13,12 +13,23 @@
   var table2;
   var i;
   var item_list=[]
+  
   function Item(sid, qty,cost) {
     this.sid = sid;
     this.qty = qty; 
     this.cost=cost;
   }
-
+  
+  function countTotalQty()
+  {
+    var totalquantity=0;
+    tb = document.getElementById("selected");
+    for (var index = 1;index<tb.rows.length; index++) {
+        totalquantity+=parseInt(tb.rows[index].cells[5].innerHTML,10)
+        console.log(totalquantity)
+    }
+    document.getElementById('total_seleceted_qty').value=totalquantity;
+  }
   function selected(x) {  
  
   table1=document.getElementById("stock");
@@ -66,7 +77,7 @@ function confirmation()
   item_list.push(item);
   sessionStorage.setItem('stock_list', JSON.stringify(item_list));
   table1.rows[i].cells[0].innerHTML=' <input type="button" id="btn_'+table1.rows[i].cells[1].innerHTML+'" onclick="selected(this)" disabled value="Selected"> '
-  
+  countTotalQty()
 
 }
 
@@ -84,11 +95,12 @@ function delete_item(p)
 			item_list.splice(c,1);	
 		}
 	}
+  countTotalQty()
 	sessionStorage.setItem('stock_list', JSON.stringify(item_list));
 
     p.parentNode.removeChild(p);
 	btn_id="btn_"+del;
-	console.log(btn_id)
+	
 	document.getElementById(btn_id).removeAttribute("disabled");
 	document.getElementById(btn_id).value="Select";
 }	
@@ -238,11 +250,19 @@ a {
     
    
 
-    <label for="Quantity"><b>Quantity</b></label>
+    <label for="qty"><b>Quantity</b></label>
     <input type="text" value={{data[0][5]}} name="qty" readonly>
 
-    <label for="Request_price"><b>Price</b></label>
+    <label for="price"><b>Price</b></label>
     <input type="text" value={{data[0][6]}} name="price" >
+
+    <label><b>Suggested Maximum Quantity</b></label>
+    <input style="width: 50%;" type="text" value={{safetystock[0]}}  readonly >
+    </br>
+    <label><b>Total Quantity Selected</b></label>
+    <input style="width: 50%;" id='total_seleceted_qty' type="text" readonly >
+    
+
     <table id="stock" style='border:1px solid black;border-collapse: collapse;text-align: center;width:100%;box-sizing: border-box;'>
         <tr style='background-color: grey'>  
           <th></th>

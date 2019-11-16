@@ -190,7 +190,7 @@ def placeOrder():
       for i in range(len(sid_list)):
          cur.execute("insert into vendor_order(Stock_id,Vendor_id,send_date,quantity,request_id) values (?,?,?,?,?)",
          sid_list[i],vid,sdate,qty_list[i],price,rid)
-         cur.execute("update request set sell_pirce=? where request_id=?",price,rid)
+         cur.execute("update request set sell_pirce=? where request_id=?",price,rid)   
    except Exception as e:
       cur.close() 
       return str(e)
@@ -241,9 +241,11 @@ def confirmRequest():
    data = cur.fetchall()
    cur.execute("select * from v_warehouse_stock where prod_id=? and cur_quantity>0 ",data[0][3])
    data2=cur.fetchall()
+   cur.execute("exec prc_showSafetyStock @pid=?",data[0][3])
+   safetystock=cur.fetchone()
    cur.close()
 
-   return render_template('confirmRequest.html',data=data,data2=data2)
+   return render_template('confirmRequest.html',data=data,data2=data2,safetystock=safetystock)
 
 @main.route('/reject',methods=['POST'])
 @role('Admin')
@@ -279,23 +281,33 @@ def showRequest():
    return render_template('showRequest.html',data=data)
 
 @main.route('/autoResponse')
-@role('Admin')
 def autoResponses():
+   a=""
+   sucess=1
    cur = con.cursor()
-   cur.execute("select sum(cur_quantity) from warehouse where prod_id='pr1' group by prod_id ")
-   qtyitem=cur.fetchall()
-   qty_stock=qtyitem[0][0]
-   cur.execute("select * from view_pending where s")
-   data = cur.fetchall()
-   df=pd.read_csv('../forecast.csv',skiprows=1,index_col=False)
-   qty_forecast=int(df.iloc[-1,1])
+   cur.execute("select * from v_autoResponse")
+   result=cur.fetchall()
+   for data in result :
+      qty_request=data[3]
+      cur.execute("exec prc_showSafetyStock @pid=?",data[2])
+      qty_safe=cur.fetchone()
+      cur.execute("select Min(sell_price/quantity) from request where prod_id=? and sell_price is NOT NULL and DATEDIFF(MM, order_date, GETDATE()) < 6 ",data[2])
+      min_price=cur.fetchone()     
+      if(data[4]>min_price[0]):
+      
+         if(qty_request<qty_safe[0]):
+            cur.execute('exec prc_sendOrder @pid=?,@vid=?,@quantity=?,@rid=?,@price=?',data[1],data[2],data[3],data[0],data[4])
+         else:
+            detail='Stock level too low. Safety Stock Quantity:'+str(data[4])
+            cur.execute("insert into autoLog(logdate,request_id,details) values(getdate(),?,?)",data[0],detail)  
+      else:
+         detail='Sell price too low'
+         cur.execute("insert into autoLog(logdate,request_id,details) values(getdate(),?,?)",data[0],detail) 
 
-   qty_request=data[0][5]
-
-   if((qty_stock-qty_forecast)>qty_request):
-      cur.execute("insert into vendor_order values('sk1','"+str(data[0][1])+"',GETDATE(),"+str(data[0][5])+",null,'A')")
-      cur.execute("update request set status='A' where request_id='"+data[0][0]+"'")
+   
+   
    cur.commit()
+   cur.close()
    return showRequest()
 
 import time
