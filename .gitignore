@@ -4,5 +4,6 @@ TRASH
 .dist
 .__pycache__/calander.cpython-37.pyc
 .__pycache__
+SCM program/venv/__pycache__
 
-
+SCM program/venv/__pycache__/vendor.cpython-35.pyc

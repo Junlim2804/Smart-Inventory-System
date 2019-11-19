@@ -4,6 +4,7 @@ from flask_login import LoginManager,current_user
 import urllib
 from functools import wraps
 # init SQLAlchemy so we can use it later in our models
+
 db = SQLAlchemy()
 server = '(localdb)\MSSQLLocalDB'
 database = 'SCMdb'
@@ -60,3 +61,4 @@ def role(role="ANY"):
          return fn(*args, **kwargs)
       return decorated_view
    return wrapper
+app=create_app()
