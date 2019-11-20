@@ -78,7 +78,7 @@ a {
 </style>
 <div class="preloader">
 
-<form action="http://localhost:5000/addingstock" method="POST">
+<form action="{{ url_for('main.addingStock') }}" method="POST">
   <div class="container">
     <h1>Add Stock</h1>
     <hr>    

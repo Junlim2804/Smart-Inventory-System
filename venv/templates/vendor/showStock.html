@@ -3,67 +3,67 @@
 {% block content %}
 
 <div class="preloader">
-    <h1>Warehouse stock </h1>
-    <input type="checkbox" id='cbShowAll' onclick='showAll()'><f style='font-size: 14px'>show empty stock</f>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="../static/plugins/jquery/jquery.redirect.js"></script>
-    <script>
-       function showAll(){
-       var checkBox = document.getElementById("cbShowAll");
-       if (checkBox.checked == true){
-           document.getElementById("empty").style.display="";
-           document.getElementById("normal").style.display="none";
-       } else {
-           document.getElementById("normal").style.display="";
-           document.getElementById("empty").style.display="none";
-       }}
+       
+        <h1>Vendor stock </h1>
+        <input type="checkbox" id='cbShowAll' onclick='showAll()'><f style='font-size: 14px'>show empty stock</f>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="../static/plugins/jquery/jquery.redirect.js"></script>
+       <script>
+           function showAll(){
+           var checkBox = document.getElementById("cbShowAll");
+           if (checkBox.checked == true){
+               document.getElementById("empty").style.display="";
+               document.getElementById("normal").style.display="none";
+           } else {
+               document.getElementById("normal").style.display="";
+               document.getElementById("empty").style.display="none";
+           }}
 
-      
-   </script>
+
+           $(document).on("click","tr.rows", function(e){
+           if($( "."+this.id ).css( "display")== "none" )	
+           {
+               $( "."+this.id ).css( "display", "" );
+               
+           }
+           else
+           $( "."+this.id ).css( "display", "none" );
+           });     
+       </script>
+       <table style='border:1;width:100%;' id="normal">
+       {% for i in data1 %}
+
+           
+       
+       
+       <tr class='rows' id="{{i[0]}}">
+       <th style='background-color:grey'>Product ID</td>		
+       <th>{{i[0]}}</td>
+       <th style='background-color:grey'>Product Name</td>	
+       <th colspan="2">{{i[1]}}</td>
+       <th style='background-color:grey'>Total Quantity </td>	
+       <th >{{i[2]}}</td>
+       </tr>
+
+     
    
-<table style='border:1;width:100%;padding: 8px' id='normal'>
-<tr>
-<th>Stock ID</th>
-<th>Product ID</th>
-<th>Date Receive</th>
-<th>Condition</th>
-<th>Price Per Unit</th>
-<th>Current Quantity</th>
-<th>Total Quantity</th>
-</tr>
 
-
-{% for item in data %}
-{% if item[5]!=0%}
-
-<tr class='rows'>
-<td>{{item[0]}}</td>
-<td>{{item[1]}}</td>
-<td>{{item[2]}}</td>
-<td>{{item[3]}}</td>
-<td>{{item[4]}}</td>
-<td>{{item[5]}}</td>
-<td>{{item[6]}}</td>
-</tr>
-{% endif %}		
-{% endfor %}
-</table>
-<table style='border:1;display:none;width:100%' id='empty' >
-<tr>
-<th>Stock ID</th>
-<th>Product ID</th>
-<th>Date Receive</th>
-<th>Condition</th>
-<th>Price Per Unit</th>
-<th>Current Quantity</th>
-<th>Total Quantity</th>
-</tr>
-
+   
+     <tr class="{{i[0]}}" style="display:none;border-top:4pt solid black;" >
+       <th>Stock ID</th>
+       <th>Product Name</th>
+       <th>Date Receive</th>
+       <th>Condition</th>
+       <th>Price Per Unit</th>
+       <th>Init Quantity</th>
+       <th>Current Quantity</th>
+     </tr>
+ 
 
 {% for item in data %}
+{% if (item[5]!=0 and item[8]==i[0])%}
 
-
-<tr class='rows'>
+<tr class="{{i[0]}}" style="display:none">
 <td>{{item[0]}}</td>
 <td>{{item[1]}}</td>
 <td>{{item[2]}}</td>
@@ -73,13 +73,75 @@
 <td>{{item[6]}}</td>
 </tr>
 
-{% endfor %}
-</table>      
 
-</div>
-<div id="ajax-content"></div>
+{% endif %}	
+ 
+{% endfor %}
+<tr class="{{i[0]}}" style="display:none;border-top:4pt solid black;">	
+   <td colspan="7"> </td>
+</tr>
+
+
+{% endfor %}
+<table style='border:1;width:100%;display:none' id="empty">
+{% for i in data1 %}
+
+   
+
+
+<tr class='rows' id="{{i[0]}}">
+<th>Product ID</td>		
+<th>{{i[0]}}</td>
+<th>Product Name</td>	
+<th colspan="2">{{i[1]}}</td>
+<th>Total Quantity </td>	
+<th >{{i[2]}}</td>
+</tr>
+
+
+
+
+
+<tr class="{{i[0]}}" style="display:none;border-top:4pt solid black;" >
+<th>Stock ID</th>
+<th>Product Name</th>
+<th>Date Receive</th>
+<th>Condition</th>
+<th>Price Per Unit</th>
+<th>Init Quantity</th>
+<th>Current Quantity</th>
+</tr>
+
+
+{% for item in data %}
+{% if (item[8]==i[0])%}
+
+<tr class="{{i[0]}}" style="display:none">
+<td>{{item[0]}}</td>
+<td>{{item[1]}}</td>
+<td>{{item[2]}}</td>
+<td>{{item[3]}}</td>
+<td>{{item[4]}}</td>
+<td>{{item[5]}}</td>
+<td>{{item[6]}}</td>
+</tr>
+
+
+{% endif %}	
+
+{% endfor %}
+<tr class="{{i[0]}}" style="display:none;border-top:4pt solid black;">	
+   <td colspan="7"> </td>
+</tr>
+
+
+{% endfor %}    
+
+   </div>
+   <div id="ajax-content"></div>
 </div>
 <!--End Content-->
+</div>
 </div>
 
 {% endblock %}

@@ -75,7 +75,7 @@ a {
 </head>
 <body style="width:40%">
 
-<form action="http://localhost:5000/PlaceOrder" method="POST">
+<form action="{{ url_for('vendor.placeOrder') }}" method="POST">
   <div class="container">
     <h1>Invoice Summary</h1>
 

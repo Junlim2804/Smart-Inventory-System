@@ -12,6 +12,23 @@
                                 
                                 {% endfor %}
                         </select>
+
+                <script>
+                        var query = window.location.search.substring(1);
+                        query=query.substring(4,query.size)
+                        console.log(query)
+                        var s_option=document.getElementById('ftype')
+                        for(var index=0;index<s_option.options.length;index++)
+                        {
+                                console.log(s_option.options[index].text)
+                                if(s_option.options[index].value==query)
+                                {
+                                        console.log(s_option.options[index].text)
+                                        s_option.selectedIndex=index;
+                                        break;
+                                }
+                        }
+                </script>
                 <input type="submit" value="Forecast">
                 </form>
             

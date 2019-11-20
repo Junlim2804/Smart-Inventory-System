@@ -31,7 +31,7 @@ con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";
 
 @vendor.route('/vendor')
 def vendorindex():
-   return "vendor"
+   return index()
 
 @vendor.route('/vendor/index')
 @role("Vendor")
@@ -85,10 +85,13 @@ def showStock():
  
 
    cur = con.cursor()
-   cur.execute("select * from v_vendor_stock where vendor_id='"+current_user.vendorID+"' order by receive_date asc")
+   cur.execute("select * from v_vendor_stock where vendor_id='"+current_user.vendorID+"' and receive_date is not NULL order by receive_date asc")
    data = cur.fetchall()
+   cur.execute("select prod_id,prod_name,sum(cur_quantity) as 'Total Quantity' from v_vendor_stock where vendor_id='"+current_user.vendorID+"'  group by prod_id,prod_name" )
+   product=cur.fetchall()
+   cur.close()
    
-   return render_template('vendor/showStock.html',data=data)
+   return render_template('vendor/showStock.html',data=data,data1=product)
 
 @vendor.route('/errorMsg')
 @role("Vendor")
@@ -214,7 +217,7 @@ def showPending():
    data = cur.fetchall()   
 
    cur.close()
-   return render_template('vendor/showPurchaseOrder.html',data=data)
+   return render_template('vendor/showPending.html',data=data)
 
 @vendor.route('/vendor/deliveryOrder')
 @role('Vendor')
@@ -241,7 +244,7 @@ def confirmDO():
 
    
    return render_template('vendor/confirmDelivery.html',data=data,data2=data2)
-
+import datetime
 @vendor.route('/vendor/addStore',methods=['POST'])
 @role('Vendor')
 def addStore():
@@ -252,16 +255,19 @@ def addStore():
    sid_list=request.form.getlist('sid[]')
    qty_list=request.form.getlist('qty[]')
    #next value for seq_request
- 
+   sdate=sdate[:-3]
+   now = datetime.datetime.now()
    cur=con.cursor()
+
    try:
-      for i in range(len(sid_list)):
-         print(vid)
-         print(sid_list[i])
-         print(sdate)
-         cur.execute("insert into vendor_store(vs_id,vendor_id,stock_id,send_date,init_quantity,cur_quantity,cost_price) values (next value for seq_vendorstore,?,?,?,?,?,?)"
-         ,vid,sid_list[i],sdate,qty_list[i],qty_list[i],price)
+      for i in range(len(sid_list)):                      
          
+         cur.execute("insert into vendor_store(vs_id,vendor_id,stock_id,send_date,init_quantity,cur_quantity,cost_price) values (concat('v',next value for seq_vendorstore),?,?,?,?,?,?)"
+         ,vid,sid_list[i],sdate,qty_list[i],qty_list[i],price)
+      cur.execute("update request set status='C' where request_id=?",rid)  
+
+      
+      
    except Exception as e:    
         
       cur.close() 
@@ -273,6 +279,15 @@ def addStore():
    #cur.execute("")
    #cur.close()
    
+@vendor.route('/showCompletedRequest')
+@role('Vendor')
+def showRequestCompleteHistory():
+   request_id=request.args.get('rid')  
+   cur = con.cursor()
+   cur.execute("select * from v_showRequest where request_id='"+request_id+"'")
+   data = cur.fetchall()
+   cur.execute("select Stock_id,Send_date,Quantity from vendor_order where request_id=?",request_id)
+   data2=cur.fetchall()
 
-
+   return render_template('vendor/showAcceptedOrder.html',data=data,data2=data2)
 

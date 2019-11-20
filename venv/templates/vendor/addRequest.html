@@ -74,7 +74,7 @@ a {
 <div style="display:inline;">
 
 
-<form action="http://localhost:5000/addRequest" method="POST">
+<form action="{{ url_for('vendor.addRequest') }}" method="POST">
   <div class="container">
     <h1>Request Item</h1>
     {% with messages = get_flashed_messages() %}

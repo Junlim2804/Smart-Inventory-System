@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "vendor/vendorbase.html" %}
 
 {% block content %}
 
@@ -23,15 +23,20 @@
         
         
             <tr >
-            <td><a href='{{ url_for("main.showRequestHistory") }}?rid={{item[0]}}'>{{item[0]}}</a></td>
+            <td><a href='{{ url_for("vendor.confirmDO") }}?rid={{item[0]}}'>{{item[0]}}</a></td>
             <td>{{item[1]}}</td>
             <td>{{item[2]}}</td>
             <td>{{item[3]}}</td>
             <td>{{item[4]}}</td>
             <td>{{item[5]}}</td>
             <td>{{item[6]}}</td>
-            <td>{{item[7]}}</td>
-            
+            {% if item[7]=='A' %}
+            <td>Accepted</td>
+            {% elif item[7]=='P' %}
+            <td>Pending</td>
+            {% elif item[7]=='R' %}
+            <td>Rejected</td>
+            {% endif %}		
             </tr>
         
         {% endfor %}

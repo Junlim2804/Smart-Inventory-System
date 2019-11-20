@@ -33,22 +33,22 @@ password = 'Guest'
 driver= '{ODBC Driver 17 for SQL Server}'
 con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
-
-
-
 @main.route('/')
+@login_required
 def index():
-   return render_template('index.html')
+   return redirect(url_for('main.profile'))
 
 @main.route('/profile')
 @role('Admin')
 def profile():
-   return render_template('profile.html', name=current_user.name)
+   cur=con.cursor()
+   cur.execute("select count(*) from request where status='P'")
+   data=cur.fetchone()
+   return render_template('profile.html', name=current_user.name,requestPending=data[0])
 
 @main.route('/showGraph',methods = ['GET'])
 @role('Admin')
-def showGraph():
-   
+def showGraph():   
    cur = con.cursor()
    cur.execute("select * from product")
    product = cur.fetchall()
@@ -234,10 +234,10 @@ def forecast():
 def confirmRequest():
    request_id=request.args.get('rid')
    if(request_id==None):
-      return showRequest()
+      return redirect(url_for('main.showPending'))
 
    cur = con.cursor()
-   cur.execute("select * from view_pending where request_id='"+request_id+"'")
+   cur.execute("select * from v_showRequest where status='P' and request_id='"+request_id+"'")
    data = cur.fetchall()
    cur.execute("select * from v_warehouse_stock where prod_id=? and cur_quantity>0 ",data[0][3])
    data2=cur.fetchall()
@@ -246,6 +246,24 @@ def confirmRequest():
    cur.close()
 
    return render_template('confirmRequest.html',data=data,data2=data2,safetystock=safetystock)
+
+
+@main.route('/showRequestHistory')
+@role('Admin')
+def showRequestHistory():
+   request_id=request.args.get('rid')
+   if(request_id==None):
+      return redirect(url_for('main.showRequest'))
+   
+   cur = con.cursor()
+   cur.execute("select * from v_showRequest where request_id='"+request_id+"'")
+   data = cur.fetchall()
+   cur.execute("select Stock_id,Send_date,Quantity from vendor_order where request_id=?",request_id)
+   data2=cur.fetchall()
+
+   return render_template('completedRequest.html',data=data,data2=data2)
+
+
 
 @main.route('/reject',methods=['POST'])
 @role('Admin')
@@ -271,10 +289,20 @@ def showAllRequest():
    cur.close()
    return render_template('requestHistory.html',data=data)
 
+@main.route('/showPending')
+@role('Admin')
+def showPending():   
+   cur = con.cursor()
+   cur.execute("select * from v_requesthistory where status='P'")
+   data = cur.fetchall()   
+
+   cur.close()
+   return render_template('showRequest.html',data=data)
+
 @role('Admin')
 def showRequest():
    cur = con.cursor()
-   cur.execute("select * from view_pending")
+   cur.execute("select * from v_showRequest")
    data = cur.fetchall()   
 
    cur.close()

@@ -22,23 +22,11 @@ password = 'Guest'
 driver= '{ODBC Driver 17 for SQL Server}'
 con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 cur=con.cursor()
-cur.execute("select format([date], 'MMMMyyyy'),Prediction from forecast where prod_id='pr1' and [date]>getdate()")
+cur.execute("select vs.vs_id,vs.date,vs.quantity as 'sales', vd.quantity as 'Disposal',unit_price from vendor_disposal vd,vendor_sales vs where vs.vs_id=vd.vs_id and vs.date=vd.date")
 data=cur.fetchall()
-hover1 = HoverTool(tooltips=[("Sales", "@y")])
-X=[]
-Y=[]
 for i in data:
-    X.append(i[0])
-    Y.append(i[1])
+    print(i)
 
-#Y = y.iloc[-1:].values
-p = figure(x_range=X, plot_height=400,x_axis_label='Month',x_minor_ticks=1,
-         title="Forecast Sales",toolbar_location=None, tools=[hover1])
-
-p.line(y=Y,x=X,line_width=2)
-
-#p.y_range.start =0
-show(p)
 
 
 

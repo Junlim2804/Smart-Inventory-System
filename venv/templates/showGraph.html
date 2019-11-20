@@ -31,7 +31,7 @@
 			<div class="preloader">
 				<h1>Sales for 2018</h1>
 				{{data}}
-				<form action="http://localhost:5000/showGraph" method="GET">
+				<form action="{{ url_for('main.showGraph') }}" method="GET">
 						Type:<select id='pid' name='pid' onchange="getIndex()"> 
 								{% for item in product %}
 								<option value='{{item[0]}}'>{{item[1]}}</option>
