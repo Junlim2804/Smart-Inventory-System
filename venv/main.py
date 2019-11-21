@@ -15,7 +15,7 @@ from bokeh.embed import components
 from bokeh.models.sources import ColumnDataSource
 #flask import
 from flask_login import login_required, current_user
-from flask import Flask, render_template,url_for,request,redirect,Blueprint,render_template
+from flask import Flask, render_template,url_for,request,redirect,Blueprint,render_template,flash
 
 from pmdarima.arima import auto_arima
 from . import db
@@ -35,7 +35,8 @@ con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";
 
 @main.route('/')
 @login_required
-def index():
+def index():   
+   flash('testing')
    return redirect(url_for('main.profile'))
 
 @main.route('/profile')
@@ -44,7 +45,9 @@ def profile():
    cur=con.cursor()
    cur.execute("select count(*) from request where status='P'")
    data=cur.fetchone()
-   return render_template('profile.html', name=current_user.name,requestPending=data[0])
+   cur.execute("select TOP 1 logDate from autoLog where logType='F'order by LogDate desc")
+   data2=cur.fetchone()
+   return render_template('profile.html', name=current_user.name,requestPending=data[0],logdate=data2[0])
 
 @main.route('/showGraph',methods = ['GET'])
 @role('Admin')
@@ -52,16 +55,24 @@ def showGraph():
    cur = con.cursor()
    cur.execute("select * from product")
    product = cur.fetchall()
-   cur.execute("select DISTINCT year(send_date) from vendor_order order by year(send_date)")
+   cur.execute("select DISTINCT year(send_date) from vendor_order order by year(send_date) desc")
    year=cur.fetchall()
    try:
       Product_ID=request.args.get('pid')
       syear=request.args.get('year')
    except Exception as e:
-      return render_template("showGraph.html",product=product,year=year,data=e)
+      Product_ID=product[0][0]
+      syear=year[len(year)-1][0]
+      print(Product_ID)
+      print(syear)
    
    if(Product_ID==None and syear==None):
-      return render_template("showGraph.html",product=product,year=year)
+      Product_ID=product[0][0]
+      syear=year[len(year)-1][0]
+      syear=str(syear)
+      print(Product_ID)
+      print(syear)
+      
 
    SQL_Query = pd.read_sql_query("set nocount on exec [prc_getsalesbymonth] @year="+syear, con)
    
@@ -133,6 +144,7 @@ def addStock():
    cur.close()
    
    return render_template('addStock.html',data=data,seq=seq)
+
 @main.route('/addingstock',methods = ['POST'])
 @role('Admin')
 def addingStock():
@@ -151,10 +163,14 @@ def addingStock():
    
    try:
       cur.execute("insert into warehouse values(CONCAT('sk', Next value for seq_warehouse),?,?,?,?,?,?,?)",(Prod_ID,Receive_Date,Condition,price,quantity,quantity,Supplier_ID))
-      con.commit()
+      
       if(cur.rowcount):
-         return ("Order sucessful placed")
+         cur.commit()
+         flash("Order sucessful placed")
+         return redirect(url_for('main.showStock'))
+         
       else:
+         cur.close()
          return "error"
    except Exception as e:
       return str(e)
@@ -167,10 +183,10 @@ def addOrder():
    #sid=request.form['sid']
    vid=request.form['vid']
    #qty=request.form['qty']
-   #price=request.form['price']
+   price=request.form['price']
    
    
-   return render_template('addOrder.html',data=rid,data1=vid) 
+   return render_template('addOrder.html',data=rid,data1=vid,data2=price) 
 
 
 @main.route('/PlaceOrder',methods=['POST'])
@@ -189,13 +205,15 @@ def placeOrder():
    try:
       for i in range(len(sid_list)):
          cur.execute("insert into vendor_order(Stock_id,Vendor_id,send_date,quantity,request_id) values (?,?,?,?,?)",
-         sid_list[i],vid,sdate,qty_list[i],price,rid)
-         cur.execute("update request set sell_pirce=? where request_id=?",price,rid)   
+         sid_list[i],vid,sdate,qty_list[i],rid)
+         cur.execute("update request set sell_price=?,status='A' where request_id=?",price,rid)
+          
    except Exception as e:
       cur.close() 
       return str(e)
    cur.commit()
-   return "<script>sessionStorage.setItem('stock_list', JSON.stringify([]));</script><h1>sucess</h1>"
+   flash('Responses sent')
+   return redirect(url_for('main.showPending'))
 @main.route('/home')
 @role('Admin')
 def home():
@@ -308,6 +326,13 @@ def showRequest():
    cur.close()
    return render_template('showRequest.html',data=data)
 
+@main.route('/callForecast')
+@role('Admin')
+def callForecast():
+   monthlyforecast()
+   flash('Re-Calculate Completed')
+   return redirect(url_for('main.forecast'))
+
 @main.route('/autoResponse')
 def autoResponses():
    a=""
@@ -330,7 +355,7 @@ def autoResponses():
             cur.execute("insert into autoLog(logdate,request_id,details) values(getdate(),?,?)",data[0],detail)  
       else:
          detail='Sell price too low'
-         cur.execute("insert into autoLog(logdate,request_id,details) values(getdate(),?,?)",data[0],detail) 
+         cur.execute("insert into autoLog(logdate,request_id,details,logtype) values(getdate(),?,?,'RE')",data[0],detail) 
 
    
    

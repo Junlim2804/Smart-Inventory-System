@@ -275,9 +275,7 @@ def addStore():
    cur.commit()
    cur.close()
    return "Sucess"
-   #cur=con.cursor()
-   #cur.execute("")
-   #cur.close()
+
    
 @vendor.route('/showCompletedRequest')
 @role('Vendor')

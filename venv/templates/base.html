@@ -36,11 +36,19 @@
               text-align: left;
               padding: 8px;
             }
+
+			
+			.notification.is-danger {
+							  background-color:green;
+							  color: #fff;
+							  font-size: xx-large;}
             
          
             </style>
 <body onload='load()'>
+
 <!--Start Header-->
+
 <div id="screensaver">
 	<canvas id="canvas"></canvas>
 	<i class="fa fa-lock" id="screen_unlock"></i>
@@ -63,6 +71,7 @@
 		</div>
 	</div>
 </div>
+
 <header class="navbar">
 	<div class="container-fluid expanded-panel">
 		<div class="row">
@@ -193,7 +202,14 @@
 				</div>
 			</div>
 
-			
+			<div class="box">
+					{% with messages = get_flashed_messages() %}
+				  {% if messages %}
+				  <div class="notification is-danger">
+					{{ messages[0] }}
+				  </div>
+				  {% endif %}
+				  {% endwith %}
 			
 				{% block content %}
 				{% endblock %}	

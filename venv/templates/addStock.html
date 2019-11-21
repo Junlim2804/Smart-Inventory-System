@@ -95,7 +95,7 @@ a {
    
     <select id='ftype' name='pid' style="width:50%"> 
         {% for item in data %}
-        <option value='pr1'>{{item[1]}}</option>
+        <option value='{{item[0]}}'>{{item[1]}}</option>
         
         {% endfor %}
     </select>

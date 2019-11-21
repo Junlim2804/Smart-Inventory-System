@@ -4,7 +4,7 @@
 
 
 			<div class="preloader">
-				 <h1>Warehouse Request </h1>				 
+				 <h1>Request History </h1>				 
 				
     <table style='border:1' >
             <tr>
@@ -36,6 +36,8 @@
             <td>Pending</td>
             {% elif item[7]=='R' %}
             <td>Rejected</td>
+            {% elif item[7]=='C' %}
+            <td>Completed</td>
             {% endif %}		
             </tr>
         

@@ -1,4 +1,4 @@
-from flask import Flask,current_app
+from flask import Flask,current_app,render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager,current_user
 import urllib
@@ -39,7 +39,7 @@ def create_app():
     # blueprint for auth routes in our app
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
-
+    app.register_error_handler(404, page_not_found)
     # blueprint for non-auth parts of app
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
@@ -48,6 +48,10 @@ def create_app():
     app.register_blueprint(vendor_blueprint)
 
     return app
+
+def page_not_found(e):
+  return render_template('404.html'), 404
+  
 def role(role="ANY"):
    def wrapper(fn):
       @wraps(fn)
