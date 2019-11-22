@@ -33,8 +33,7 @@ password = 'Guest'
 driver= '{ODBC Driver 17 for SQL Server}'
 con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
-@main.route('/')
-@login_required
+
 def index():   
    flash('testing')
    return redirect(url_for('main.profile'))

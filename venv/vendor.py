@@ -63,13 +63,17 @@ def addRequest():
    try:
       cur.execute("insert into request values(CONCAT('R',next value for seq_request),?,?,?,?,getdate(),'P',null)",(vid,pid,price,qty))
       #insert into request values(next value for seq_request,'v1',100,10,getdate())
-      con.commit()
+     
       if(cur.rowcount):
-         return redirect(url_for('vendor.showComplete'))
+         con.commit()
+         flash("Request Sent")         
+         return redirect(url_for('vendor.vendorRequest'))
       else:
+         cur.close()
          return redirect(url_for('vendor.errorMessage'))
    except Exception as e: 
        session['errmsg'] = str(e)  
+       cur.close()
        return redirect(url_for('vendor.errorMessage'))
 
 @vendor.route('/completeRequest')
@@ -274,7 +278,8 @@ def addStore():
       return str(e)
    cur.commit()
    cur.close()
-   return "Sucess"
+   flash("Stock Added")
+   return redirect(url_for('vendor.showPending'))
 
    
 @vendor.route('/showCompletedRequest')

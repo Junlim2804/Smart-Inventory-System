@@ -77,14 +77,7 @@ a {
 <form action="{{ url_for('vendor.addRequest') }}" method="POST">
   <div class="container">
     <h1>Request Item</h1>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <div class="notification is-danger">
-            {{ messages[0] }}
-        </div>
-    {% endif %}
-    {% endwith %}
-    <hr>
+   
 
     <label for="Product ID"><b>Product ID</b></label>
   </br></br>

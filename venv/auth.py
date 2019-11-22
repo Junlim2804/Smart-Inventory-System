@@ -2,15 +2,25 @@
 from werkzeug.security import generate_password_hash
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required,current_user
 from .models import User
 from . import db
 
 auth = Blueprint('auth', __name__)
 
+@auth.route('/')
+def index():     
+   return redirect(url_for('auth.login'))
+
 @auth.route('/login')
 def login():
-    return render_template('login.html')
+    if not current_user.is_authenticated:
+        return render_template('login.html')
+    if(current_user.get_urole()=='Admin'):
+        return redirect(url_for('main.profile'))
+    elif(current_user.get_urole()=='Vendor'):
+        return redirect(url_for('vendor.profile'))
+    
 
 @auth.route('/error')
 def error():
