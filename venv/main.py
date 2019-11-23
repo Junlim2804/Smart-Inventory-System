@@ -165,7 +165,7 @@ def addingStock():
       
       if(cur.rowcount):
          cur.commit()
-         flash("Order sucessful placed")
+         flash("Stock Added Sucessful")
          return redirect(url_for('main.showStock'))
          
       else:

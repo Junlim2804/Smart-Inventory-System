@@ -32,7 +32,10 @@ con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";
 @vendor.route('/vendor')
 def vendorindex():
    return index()
-
+@vendor.route('/profile')
+@role('Admin')
+def profile():
+   return index()
 @vendor.route('/vendor/index')
 @role("Vendor")
 def index():
@@ -139,7 +142,7 @@ def submitClosing():
       return str(e)
    cur.commit()
    cur.close()
-
+   flash("Closing")
    return dailyClosing()
 
 @vendor.route('/testing')
@@ -148,54 +151,75 @@ def justTesting():
    return df.to_string()
 
    
-@vendor.route('/showGraph',methods = ['GET'])
+@vendor.route('/vendor/showGraph',methods = ['GET'])
 @role('Vendor')
 def showGraph():
-   
+   Product_ID=request.args.get('pid')
+   sdate=request.args.get('sdate')  
+   edate=request.args.get('edate') 
    cur = con.cursor()
    cur.execute("select * from product")
    product = cur.fetchall()
-   cur.execute("select DISTINCT year(send_date) from vendor_order order by year(send_date)")
-   year=cur.fetchall()
-   try:
-      Product_ID=request.args.get('pid')
-      syear=request.args.get('year')
-   except Exception as e:
-      return render_template("showGraph.html",product=product,year=year,data=e)
+   print(sdate)
+   print(edate)
+   if(sdate==None and edate==None):
+      cur.execute("select * from v_vendor_closing where prod_id=?",product[0][0])
+   else: 
+      cur.execute("select * from v_vendor_closing where prod_id=? and date>=? and date<=?",Product_ID,sdate,edate)
+  
    
-   if(Product_ID==None and syear==None):
-      return render_template("showGraph.html",product=product,year=year)
+   data=cur.fetchall()
+  
+   #try:
+   #   Product_ID=request.args.get('pid')
+   #   syear=request.args.get('year')
+   #except Exception as e:
+   #   return render_template("showGraph.html",product=product,year=year,data=e)
+   #
+   #if(Product_ID==None and syear==None):
+   #   return render_template("showGraph.html",product=product,year=year)
 
-   SQL_Query = pd.read_sql_query("set nocount on exec [prc_getsalesbymonth] @year="+syear, con)
-   
-   df = pd.DataFrame(SQL_Query)
-   
-   X = df.columns[1:13].values
-   y = df.loc[df['product_id'] == Product_ID].iloc[0,1:13].values
-   #y = df.loc[0,1:13].values
+   X=[]
+   y1=[]
+   y2=[]
+   for i in data:      
+      X.append(i[1])
+      y1.append(i[2])
+      y2.append(i[3])
+   print(X)
+   print(y1)
    hover1 = HoverTool(tooltips=[("Quantity", "@top")])
-   barchart = figure(x_range=X, plot_height=250, title="Stock Counts",
-            toolbar_location=None, tools=[hover1])
-   barchart.vbar(x=X, top=y, width=0.5)
+   barchart = figure(x_axis_type='datetime',plot_height=250, title="Stock Counts",
+         toolbar_location=None, tools=[hover1])
+   barchart.vbar(x=X, top=y1, width=70400000)
 
-   barchart.xgrid.grid_line_color = 'red'
    barchart.y_range.start = 0
+   barchart.xaxis.formatter=DatetimeTickFormatter(
+        days=["%d %B %Y"],
+        months=["%d %B %Y"],
+        years=["%d %B %Y"],
+    )
    
    hover2 = HoverTool(tooltips=[("Quantity", "@y")])
-   p = figure(plot_width=400, plot_height=400,x_range=['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep',
-       'oct', 'nov', 'dec'],tools=[hover2])
-  
-   # add a line renderer
+   p = figure(x_axis_type='datetime',plot_height=250, title="Stock Counts",
+            toolbar_location=None, tools=[hover1])
+   p.vbar(x=X, top=y2, width=70400000)
 
-   p.line(y=y,x=X,line_width=2)
-   tab1 = Panel(child=barchart, title="Bar")
-   tab2 = Panel(child=p, title="Line")
-   tabs = Tabs(tabs=[tab1, tab2])
+   p.y_range.start = 0
+   p.xaxis.formatter=DatetimeTickFormatter(
+         days=["%d %B %Y"],
+         months=["%d %B %Y"],
+         years=["%d %B %Y"],
+      )
+
+   tab1 = Panel(child=barchart, title="Sales")
+   tab2 = Panel(child=p, title="Dispose")
+   tabs = Tabs(tabs=[tab1, tab2])   
    script, div = components(tabs)
 
    #script2, div2 = components(p)
-   return render_template("showGraph.html", bars_count=1,
-                           the_div=div, the_script=script,product=product,year=year)
+   return render_template("vendor/showGraph.html", bars_count=1,
+                           the_div=div, the_script=script,product=product)
 
 
    

@@ -1,0 +1,79 @@
+{% extends "vendor/vendorbase.html" %}
+
+{% block content %}
+
+
+		<script>
+				
+				
+			</script>
+			<div class="preloader">
+				<h1>Sales And Disposal</h1>
+				{{data}}
+				<form action="{{ url_for('vendor.showGraph') }}" method="GET">
+						Type:<select id='pid' name='pid' onchange="getIndex()"> 
+								{% for item in product %}
+								<option value='{{item[0]}}'>{{item[1]}}</option>
+								
+								{% endfor %}
+							</select>
+						start date:<input id='datefield1' name='sdate' type='date'>
+						end date:<input id='datefield2' name='edate' type='date'>
+						<input type="hidden"  id="ddlproduct" name='ddlproduct' value='0'>
+						<input type="submit" value="Search">
+				</form>
+				<script>
+						var today = new Date();
+						var dd = today.getDate();
+						var mm = today.getMonth()+1; //January is 0!
+						var yyyy = today.getFullYear();
+						if(dd<10){
+								dd='0'+dd
+							} 
+							if(mm<10){
+								mm='0'+mm
+							} 
+
+						today = yyyy+'-'+mm+'-'+dd;
+						document.getElementById("datefield1").setAttribute("max", today);
+						document.getElementById("datefield2").setAttribute("max", today);
+
+						var url_string = window.location.href; 
+						var url = new URL(url_string);
+						var selected_sdate = url.searchParams.get("sdate");
+						var selected_edate= url.searchParams.get("edate");
+						var index_pid= url.searchParams.get("ddlproduct");
+						document.getElementById("datefield1").value=selected_sdate
+						document.getElementById("datefield2").value=selected_edate
+						if(index_pid!=null)
+						{
+							document.getElementById("pid").selectedIndex=index_pid;	
+							document.getElementById("year").selectedIndex=index_year;		
+
+						}
+						function getIndex()
+							{
+								document.getElementById("ddlproduct").value=document.getElementById("pid").selectedIndex;
+								document.getElementById("ddlyear").value=document.getElementById("year").selectedIndex;
+
+							}
+						
+					
+			 	</script>
+                <div id='bar'>
+				
+                {{ the_div|safe }}
+                <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-1.3.4.min.js"></script>
+                {{ the_script|safe }}
+                </div>
+   
+      
+   </body>
+			</div>
+			<div id="ajax-content"></div>
+		</div>
+		<!--End Content-->
+	</div>
+</div>
+
+{% endblock %}
