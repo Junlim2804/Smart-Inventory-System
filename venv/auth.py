@@ -19,7 +19,7 @@ def login():
     if(current_user.get_urole()=='Admin'):
         return redirect(url_for('main.profile'))
     elif(current_user.get_urole()=='Vendor'):
-        return redirect(url_for('vendor.profile'))
+        return redirect(url_for('vendor.index'))
     
 
 @auth.route('/error')

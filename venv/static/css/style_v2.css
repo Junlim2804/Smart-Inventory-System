@@ -1,4 +1,4 @@
-* {outline:none !important;}
+﻿* {outline:none !important;}
 body {
   color:#525252;
   background:#353535;
@@ -177,8 +177,8 @@ a.show-sidebar:hover {
 }
 #main {
   margin-top: 50px;
-  min-height: 800px;
-  overflow: hidden;
+  min-height: 1500px;
+  overflow: visible;
 }
 #search {
   position: relative;
@@ -554,7 +554,7 @@ ul.DTTT_dropdown.dropdown-menu > li:hover > a {
   background:rgba(0, 0, 0, 0.3);
   color:#f0f0f0;
 }
-.dataTables_wrapper input[type="text"] {
+.dataTables_wrapper input[type=text] {
   display: block;
   width: 90%;
   height: 26px;
@@ -579,7 +579,7 @@ ul.DTTT_dropdown.dropdown-menu > li:hover > a {
   -o-transition: 0.2s;
   transition: 0.2s;
 }
-.dataTables_wrapper input[type="text"]:focus {
+.dataTables_wrapper input[type=text]:focus {
   border-color: #66afe9;
   outline: 0;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);

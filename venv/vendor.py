@@ -32,10 +32,7 @@ con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";
 @vendor.route('/vendor')
 def vendorindex():
    return index()
-@vendor.route('/profile')
-@role('Admin')
-def profile():
-   return index()
+
 @vendor.route('/vendor/index')
 @role("Vendor")
 def index():
@@ -115,8 +112,8 @@ def dailyClosing():
    cur.execute("select * from vendor_sales where date=cast(getDATE() as date)")
    data=cur.fetchall()
 
-   if(len(data)>0):
-      return "<h1>CLOSING DONE TODAY</h1>"
+   #if(len(data)>0):
+   #   return "<h1>CLOSING DONE TODAY</h1>"
    cur.execute("select * from v_vendor_stock where cur_quantity>0 and vendor_id='"+current_user.vendorID+"' order by vs_id asc")
    data = cur.fetchall()   
    return render_template('vendor/dailyClosing.html',data=data)
