@@ -2,11 +2,12 @@
 
 {% block content %}
 
-
+    
 			<div class="preloader">
-				 <h1>Warehouse Request </h1>				 
+				 <h1>Request History </h1>				 
 				
-    <table style='border:1' >
+    <table class="display" style='border:1' >
+        <thead>
             <tr>
             <th>Request ID</th>
             <th>Vendor ID</th>
@@ -17,8 +18,8 @@
             <th>Request Date</th>
             <th>Status</th>
             </tr>
-        
-        
+        </thead>
+        <tbody>
             {% for item in data %}
         
         
@@ -43,6 +44,7 @@
             </tr>
         
         {% endfor %}
+        </tbody>
         </table>  
 
 			</div>
@@ -51,4 +53,13 @@
 		<!--End Content-->
 	</div>
 </div>
+
+<script src='https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js'></script>
+
+
+<script>
+    $(document).ready(function() {
+    $('table.display').DataTable();
+} );
+</script>
 {% endblock %}

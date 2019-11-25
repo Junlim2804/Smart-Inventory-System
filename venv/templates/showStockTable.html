@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <h1 class="h3 mb-2 text-gray-800">Stock Table</h1>
+     
+    
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                  <thead>
+                    <tr>
+                        <th>Stock ID</th>
+                        <th>Product Name</th>
+                        <th>Date Receive</th>
+                        <th>Condition</th>
+                        <th>Price Per Unit</th>
+                        <th>Init Quantity</th>
+                        <th>Current Quantity</th>
+                    </tr>
+                  </thead>
+                  <tfoot>
+                    <tr>
+                        <th>Stock ID</th>
+                        <th>Product Name</th>
+                        <th>Date Receive</th>
+                        <th>Condition</th>
+                        <th>Price Per Unit</th>
+                        <th>Init Quantity</th>
+                        <th>Current Quantity</th>
+                    </tr>
+                  </tfoot>
+                  <tbody>
+                    
+                      {% for item in data %}
+                      {% if (item[5]!=0) %}
+                    <tr>
+                      <td>{{item[0]}}</td>
+                      <td>{{item[1]}}</td>
+                      <td>{{item[2]}}</td>
+                      <td>{{item[3]}}</td>
+                      <td>{{item[4]}}</td>
+                      <td>{{item[5]}}</td>
+                      <td>{{item[6]}}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                    
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="../static/vendor/vendor/jquery/jquery.min.js"></script>
+  <script src="../static/vendor/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="../static/vendor/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="../static/vendor/js/sb-admin-2.min.js"></script>
+
+  <!-- Page level plugins -->
+  <script src="../static/vendor/vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="../static/vendor/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+  <!-- Page level custom scripts -->
+  <script src="../static/vendor/js/demo/datatables-demo.js"></script>
+
+  {% endblock %}

@@ -31,6 +31,7 @@ con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";
 
 @vendor.route('/vendor')
 def vendorindex():
+   return render_template('vendor/tables.html')
    return index()
 
 @vendor.route('/vendor/index')
@@ -97,6 +98,20 @@ def showStock():
    
    return render_template('vendor/showStock.html',data=data,data1=product)
 
+@vendor.route('/vendor/showStockTable')
+@role("Vendor")
+def showStockTable():
+   if(current_user.vendorID is None):
+      return redirect(url_for('auth.error')) 
+ 
+
+   cur = con.cursor()
+   cur.execute("select * from v_vendor_stock where vendor_id='"+current_user.vendorID+"' and receive_date is not NULL order by receive_date asc")
+   data = cur.fetchall()
+   cur.close()
+   
+   return render_template('vendor/showStockTable.html',data=data)
+
 @vendor.route('/errorMsg')
 @role("Vendor")
 def errorMessage():
@@ -107,7 +122,7 @@ def errorMessage():
 
 @vendor.route('/vendor/dailyClosing')
 @role('Vendor')
-def dailyClosing():    
+def dailyClosing():     
    cur = con.cursor()
    cur.execute("select * from vendor_sales where date=cast(getDATE() as date)")
    data=cur.fetchall()
@@ -157,24 +172,15 @@ def showGraph():
    cur = con.cursor()
    cur.execute("select * from product")
    product = cur.fetchall()
-   print(sdate)
-   print(edate)
+
    if(sdate==None and edate==None):
-      cur.execute("select * from v_vendor_closing where prod_id=?",product[0][0])
+      cur.execute("select TOP 7 * from v_vendor_closing where prod_id=?",product[0][0])
    else: 
       cur.execute("select * from v_vendor_closing where prod_id=? and date>=? and date<=?",Product_ID,sdate,edate)
   
    
-   data=cur.fetchall()
-  
-   #try:
-   #   Product_ID=request.args.get('pid')
-   #   syear=request.args.get('year')
-   #except Exception as e:
-   #   return render_template("showGraph.html",product=product,year=year,data=e)
-   #
-   #if(Product_ID==None and syear==None):
-   #   return render_template("showGraph.html",product=product,year=year)
+   data=cur.fetchall()  
+
 
    X=[]
    y1=[]
@@ -183,8 +189,7 @@ def showGraph():
       X.append(i[1])
       y1.append(i[2])
       y2.append(i[3])
-   print(X)
-   print(y1)
+
    hover1 = HoverTool(tooltips=[("Quantity", "@top")])
    barchart = figure(x_axis_type='datetime',plot_height=250, title="Stock Counts",
          toolbar_location=None, tools=[hover1])

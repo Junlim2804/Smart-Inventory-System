@@ -1,7 +1,20 @@
 {% extends "vendor/vendorbase.html" %}
 
 {% block content %}
-
+<style>
+   
+            table {
+              font-family: arial, sans-serif;
+              border-collapse: collapse;
+              width: 100%;
+            }
+            
+            td, th {
+              border: 1px solid #dddddd;
+              text-align: left;
+              padding: 8px;
+            }
+</style>
 <div class="preloader">
        
         <h1>Vendor stock </h1>
@@ -37,11 +50,11 @@
        
        
        <tr class='rows' id="{{i[0]}}">
-       <th style='background-color:grey'>Product ID</td>		
+       <th style='background-color:#add8e6'>Product ID</td>		
        <th>{{i[0]}}</td>
-       <th style='background-color:grey'>Product Name</td>	
+       <th style='background-color:#add8e6'>Product Name</td>	
        <th colspan="2">{{i[1]}}</td>
-       <th style='background-color:grey'>Total Quantity </td>	
+       <th style='background-color:#add8e6'>Total Quantity </td>	
        <th >{{i[2]}}</td>
        </tr>
 

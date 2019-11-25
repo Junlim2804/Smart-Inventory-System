@@ -6,6 +6,7 @@
 		<meta name="description" content="description">
 		<meta name="LTJ" content="Warehouse Mangement System">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src='https://code.jquery.com/jquery-3.3.1.js'></script>
 		<script type="text/javascript" src="../static/plugins/bootstrap/bootstrap.js"></script>
 		<link href="../static/plugins/bootstrap/bootstrap.css" rel="stylesheet">
 		<link href="../static/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet">
@@ -149,6 +150,12 @@
 						<span class="hidden-xs">Show Stock</span>
 					</a>
 				</li>
+				<li>
+						<a href="{{ url_for('main.showStockTable') }}" class="ajax-link">
+							
+							<span class="hidden-xs">Show Stock Table</span>
+						</a>
+					</li>
 				<li class="dropdown">
 					<a href="{{ url_for('main.showGraph') }}" class="dropdown-toggle">
 						
@@ -218,15 +225,16 @@
 
 <!--End Container-->
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<!--<script src="http://code.jquery.com/jquery.js"></script>-->
-<script src="static/plugins/jquery/jquery.min.js"></script>
-<script src="static/plugins/jquery-ui/jquery-ui.min.js"></script>
+
+
+
+<script src="../static/plugins/jquery-ui/jquery-ui.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="static/plugins/bootstrap/bootstrap.min.js"></script>
-<script src="static/plugins/justified-gallery/jquery.justifiedGallery.min.js"></script>
-<script src="static/plugins/tinymce/tinymce.min.js"></script>
-<script src="static/plugins/tinymce/jquery.tinymce.min.js"></script>
+<script src="../static/plugins/bootstrap/bootstrap.min.js"></script>
+<script src="../static/plugins/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="../static/plugins/tinymce/tinymce.min.js"></script>
+<script src="../static/plugins/tinymce/jquery.tinymce.min.js"></script>
 <!-- All functions for this theme + document.ready processing -->
-<script src="static/js/devoops.js"></script>
+<script src="../static/js/devoops.js"></script>
 </body>
 </html>

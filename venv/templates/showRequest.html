@@ -1,11 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+<script>
+        function autoResponses()
+        {
+            var r = confirm("Confirm System Response?");
+            if (r == true) {
+                window.location.href="{{ url_for('main.autoResponses') }}";
+            } else {
+                return 0;
+            }
+          
+           
+        }
+    </script>
 
 			<div class="preloader">
-				 <h1>Warehouse Request </h1>				 
-				
+				 <h1>Confirm Purchase Order </h1>				 
+                 <button onClick='autoResponses()' >Auto Responses</button>
+
     <table style='border:1' >
             <tr>
             <th>Request ID</th>

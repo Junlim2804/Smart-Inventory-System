@@ -103,6 +103,60 @@ def showGraph():
    #script2, div2 = components(p)
    return render_template("showGraph.html", bars_count=1,
                            the_div=div, the_script=script,product=product,year=year)
+                           
+@main.route('/showSales',methods = ['GET'])
+@role('Admin')
+def showSales():
+   Product_ID=request.args.get('pid')
+   sdate=request.args.get('sdate')  
+   edate=request.args.get('edate')    
+   cur = con.cursor()
+   cur.execute("select * from product")
+   product = cur.fetchall()
+   if(sdate==None and edate==None):
+      cur.execute("select TOP 7 prod_id,prod_name,send_date,sum(quantity) from showProductSales where prod_id=? group by prod_id,prod_name,send_date order by send_date desc",product[0][0])
+   else: 
+      cur.execute("select prod_id,prod_name,send_date,sum(quantity) from showProductSales where prod_id=? and send_date>=? and send_date<=? group by prod_id,prod_name,send_date order by send_date",Product_ID,sdate,edate)
+
+   
+   data=cur.fetchall()
+   X=[]
+   y1=[]
+   for i in data:
+      X.append(i[2])
+      y1.append(i[3])
+   hover1 = HoverTool(tooltips=[("Quantity", "@top")])
+   barchart = figure(x_axis_type='datetime',plot_height=250, title="Sales for "+data[0][1],
+            toolbar_location=None, tools=[hover1])
+   barchart.vbar(x=X, top=y1, width=70400000)
+
+   barchart.y_range.start = 0
+   barchart.xaxis.formatter=DatetimeTickFormatter(
+           days=["%d %b "],
+           months=["%d %b "],
+           years=["%d %b "],
+       )
+   hover2 = HoverTool(tooltips=[("Quantity", "@y")])
+   p = figure(plot_width=400, plot_height=400,tools=[hover2])
+   p.xaxis.formatter=DatetimeTickFormatter(
+        days=["%d %b"],
+        months=["%d %b"],
+        years=["%d %b"],
+    )
+   # add a line renderer
+
+   p.line(y=y1,x=X,line_width=2)
+   
+   
+
+   tab1 = Panel(child=barchart, title="Bar")
+   tab2 = Panel(child=p, title="Line")
+   tabs = Tabs(tabs=[tab1, tab2])
+   script, div = components(tabs)
+
+   #script2, div2 = components(p)
+   return render_template("showSales.html", bars_count=1,
+                           the_div=div, the_script=script,product=product)
 
 @main.route('/showStock')
 @role('Admin')
@@ -116,7 +170,17 @@ def showStock():
 
    return render_template('showStock.html',data=data,data1=product)
 
+@main.route('/showStockTable')
+@role('Admin')
+def showStockTable():
+   cur = con.cursor()
+   cur.execute("select * from v_warehouse_stock order by prod_id,date_received asc")
+   data = cur.fetchall()
+   cur.execute("select prod_id,prod_name,sum(cur_quantity) as 'Total Quantity' from v_warehouse_stock group by prod_id,prod_name order by prod_id" )
+   product=cur.fetchall()
+   cur.close()
 
+   return render_template('showStockTable.html',data=data,data1=product)
 
 @main.route('/showVendorRequest')
 @role('Admin')
@@ -351,7 +415,7 @@ def autoResponses():
             cur.execute('exec prc_sendOrder @pid=?,@vid=?,@quantity=?,@rid=?,@price=?',data[1],data[2],data[3],data[0],data[4])
          else:
             detail='Stock level too low. Safety Stock Quantity:'+str(data[4])
-            cur.execute("insert into autoLog(logdate,request_id,details) values(getdate(),?,?)",data[0],detail)  
+            cur.execute("insert into autoLog(logdate,request_id,details,logtype) values(getdate(),?,?,'RE')",data[0],detail)  
       else:
          detail='Sell price too low'
          cur.execute("insert into autoLog(logdate,request_id,details,logtype) values(getdate(),?,?,'RE')",data[0],detail) 
@@ -360,7 +424,7 @@ def autoResponses():
    
    cur.commit()
    cur.close()
-   return showRequest()
+   return redirect(url_for('main.showPending'))
 
 import time
 import atexit

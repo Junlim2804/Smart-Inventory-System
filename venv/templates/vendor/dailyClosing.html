@@ -1,6 +1,18 @@
 {% extends "vendor/vendorbase.html" %}
 
 {% block content %}
+<script src="../static/vendor/js/demo/datatables-demo.js"></script>
+<script src="../static/vendor/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="../static/vendor/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+<link href="../static/vendor/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+<script src="../static/vendor/vendor/jquery/jquery.min.js"></script>
+<script src="../static/vendor/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="../static/vendor/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="../static/vendor/js/sb-admin-2.min.js"></script>
 <script>
     function calulateRemaining(rowname)
     {
@@ -29,16 +41,17 @@
 
     }
 </script>
-<div class="preloader">
-    <h1>Warehouse stock </h1>
+<div>
+    <h1>Closing Stock Count </h1>
   
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="../static/plugins/jquery/jquery.redirect.js"></script>
+    
     
 <form action="{{ url_for('vendor.dailyClosing') }}" method="POST">
 <input type='submit'> 
     
-<table style='border:1;width:100%' >
+<table class="table table-bordered" id="dataTable" width="80%" cellspacing="0">
+    
 <tr>
 <th>Stock ID</th>
 <th>Product ID</th>
@@ -59,9 +72,9 @@
 <td>{{item[1]}}</td>
 <td>{{item[2]}}</td>
 <td>{{item[5]}}<input type="hidden" id="qty_opening_{{item[0]}}" value='{{item[5]}}'></td>
-<td><input type='number' id="today_price_{{item[0]}}" value=1.00 onchange='calulateRemaining("{{item[0]}}")' name='today_price[]'></td>
-<td><input type='number' id="qty_sales_{{item[0]}}" value=0 min=0 onchange='calulateRemaining("{{item[0]}}")' name='qty_sales[]'></td>
-<td><input type='number' id="qty_disposal_{{item[0]}}" value=0 min=0 onchange='calulateRemaining("{{item[0]}}")' name='qty_disposal[]'></td>
+<td><input style='width:100px' type='number' id="today_price_{{item[0]}}" value=1.00 onchange='calulateRemaining("{{item[0]}}")' name='today_price[]'></td>
+<td><input style='width:100px' type='number' id="qty_sales_{{item[0]}}" value=0 min=0 onchange='calulateRemaining("{{item[0]}}")' name='qty_sales[]'></td>
+<td><input style='width:100px' type='number' id="qty_disposal_{{item[0]}}" value=0 min=0 onchange='calulateRemaining("{{item[0]}}")' name='qty_disposal[]'></td>
 <td><input type="text" id="qty_remaining_{{item[0]}}" name="qty_cur[]" value="{{item[5]}}" style="background-color:rgba(0, 0, 0, 0);border:0" readonly></td>
 </tr>
 
@@ -74,5 +87,22 @@
 </div>
 <!--End Content-->
 </div>
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="../static/vendor/vendor/jquery/jquery.min.js"></script>
+  <script src="../static/vendor/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="../static/vendor/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="../static/vendor/js/sb-admin-2.min.js"></script>
+
+  <!-- Page level plugins -->
+  <script src="../static/vendor/vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="../static/vendor/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+  <!-- Page level custom scripts -->
+  <script src="../static/vendor/js/demo/datatables-demo.js"></script>
 
 {% endblock %}
