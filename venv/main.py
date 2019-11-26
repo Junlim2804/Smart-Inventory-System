@@ -392,10 +392,73 @@ def showRequest():
 @main.route('/callForecast')
 @role('Admin')
 def callForecast():
-   monthlyforecast()
-   flash('Re-Calculate Completed')
+   if(monthlyforecast()!=False):
+      flash('Re-Calculate Completed')
+   else:
+      flash('Error Please see the log')
    return redirect(url_for('main.forecast'))
+@main.route("/showForecastLog")
+@role('Admin')
+def showForecastLog():
+   cur=con.cursor()
+   cur.execute("select * from autolog where prod_id is not null order by logdate desc")
+   data=cur.fetchall()
+   cur.close()
+   return render_template('showForecastLog.html',data=data)
+@main.route("/Productsetting")
+def prod_setting():
+   cur=con.cursor()
+   cur.execute('select * from product')
+   data=cur.fetchall()
+   cur.execute("set nocount on SELECT cast(current_value as int)+1 FROM sys.sequences WHERE name = 'seq_productID'")
+   newprod=cur.fetchall()
+   newprod="pr"+str(newprod[0][0])
+   cur.close()
+   return render_template('showProductSetting.html',data=data,data1=newprod)
 
+@main.route("/updateProduct",methods=['POST'])
+def update_productSetting():
+   pid=request.form['pid']
+   pname=request.form['pname']
+   aienable=request.form['aienable']
+   cur=con.cursor()
+   try:
+            
+      cur.execute("update product set prod_name=?,prod_aiEnable=? where prod_id=?",pname,aienable,pid)
+      
+   except Exception as ex:
+      cur.close()
+      return str(ex)
+   
+   cur.close()    
+   return "Suceesful Update"
+
+@main.route("/addProduct",methods=['POST'])
+def add_product():
+   
+   pname=request.form['pname']
+   aienable=request.form['aienable']
+   cur=con.cursor()  
+   try:  
+     
+      sql="insert into product(prod_id,prod_name,prod_aiEnable) values(CONCAT('pr', Next value for seq_productID),'"+pname+"',"+aienable+")"   
+      print(sql)
+      cur.execute(sql)
+      cur.commit()
+   except Exception as ex:
+      cur.close()
+      return str(ex)
+   cur.close()    
+   return redirect(url_for('main.prod_setting'))
+
+@main.route("/showResponseLog")
+@role('Admin')
+def showResponseLog():
+   cur=con.cursor()
+   cur.execute("select * from autolog where request_id is not null order by logdate desc")
+   data=cur.fetchall()
+   cur.close()
+   return render_template('showResponseLog.html',data=data)
 @main.route('/autoResponse')
 def autoResponses():
    a=""
@@ -413,6 +476,7 @@ def autoResponses():
       
          if(qty_request<qty_safe[0]):
             cur.execute('exec prc_sendOrder @pid=?,@vid=?,@quantity=?,@rid=?,@price=?',data[1],data[2],data[3],data[0],data[4])
+            cur.execute("insert into autoLog(logdate,request_id,details,logtype) values(getdate(),?,?,'RE')",data[0],'Accepted')
          else:
             detail='Stock level too low. Safety Stock Quantity:'+str(data[4])
             cur.execute("insert into autoLog(logdate,request_id,details,logtype) values(getdate(),?,?,'RE')",data[0],detail)  
@@ -436,33 +500,46 @@ def monthlyforecast():
    cur = con.cursor()
    cur.execute("select distinct(prod_id) from show_sales")
    data=cur.fetchall()
-   for prod_id in data:
-      SQL_Query = pd.read_sql_query("select * from show_sales where prod_id='"+prod_id[0]+"'", con)
-      df=pd.DataFrame(SQL_Query)
-      df['date'] = pd.to_datetime(df['date'])
-      df=df.drop(['prod_id'], axis=1)
-      df=df.set_index('date')
+   sucess=0
+   failed=0
+   try:
+      for prod_id in data:
+         try:
+            SQL_Query = pd.read_sql_query("select * from show_sales where prod_id='"+prod_id[0]+"'", con)
+            df=pd.DataFrame(SQL_Query)
+            df['date'] = pd.to_datetime(df['date'])
+            df=df.drop(['prod_id'], axis=1)
+            df=df.set_index('date')
 
-      y=df
-      y = df['Quantity'].resample('MS').sum()
-      model = auto_arima(y, trace=True, start_p=3, start_q=3, start_P=1, start_Q=5,
-                           max_p=7, max_q=7, max_P=7, max_order=20,max_Q=6,D=1,d=1, m=1,seasonal=True,
-                           stepwise=True, error_action='ignore', suppress_warnings=True)
-      model.fit(y)
-      forecast = model.predict(n_periods=4)
-      date_index=y[-1:].index
-      x_index=[]
-      date_index=date_index+1
-      for i in range(4):
-         x_index.append(str((date_index+i).date[0]))
-      forecast=forecast.round()
-      forecast=forecast.astype(int)
-      d = {'Date': x_index, 'Prediction': forecast}
-      result = pd.DataFrame(data=d)
-      result.insert(loc=0, column='prod_id', value=prod_id[0])
+            y=df
+            y = df['Quantity'].resample('MS').sum()
+            model = auto_arima(y, trace=True, start_p=3, start_q=3, start_P=1, start_Q=5,
+                                 max_p=7, max_q=7, max_P=7, max_order=20,max_Q=6,D=1,d=1, m=1,seasonal=True,
+                                 stepwise=True, error_action='ignore', suppress_warnings=True)
+            model.fit(y)
+            forecast = model.predict(n_periods=4)
+            date_index=y[-1:].index
+            x_index=[]
+            date_index=date_index+1
+            for i in range(4):
+               x_index.append(str((date_index+i).date[0]))
+            forecast=forecast.round()
+            forecast=forecast.astype(int)
+            d = {'Date': x_index, 'Prediction': forecast}
+            result = pd.DataFrame(data=d)
+            result.insert(loc=0, column='prod_id', value=prod_id[0])
 
-      for index,row in result.iterrows():
-         cur.execute("SET NOCOUNT ON exec prc_insertForecast @prod_id=?,@fdate=?,@no=?",row['prod_id'],row['Date'],row["Prediction"])
+            for index,row in result.iterrows():
+               cur.execute("SET NOCOUNT ON exec prc_insertForecast @prod_id=?,@fdate=?,@no=?",row['prod_id'],row['Date'],row["Prediction"])
+               sucess=sucess+1
+         except Exception as e:
+               cur.execute("insert into autolog(logdate,prod_id,date,details,logtype) values (getdate(),?,?,?,'FE')",row['prod_id'],row['Date'],str(e))
+               failed=failed+1
+               continue
+   except Exception as e:
+         cur.close()         
+         return False
+   flash(str(sucess)+" forecast completed,"+str(failed)+" FAILED")
    cur.commit()
    cur.close()
 
