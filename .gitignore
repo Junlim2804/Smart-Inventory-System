@@ -8,4 +8,5 @@ venv/__pycache__
 venv/.dist
 venv/.vscode
 venv/__pycache__/auth.cpython-35.pyc
+trash
 

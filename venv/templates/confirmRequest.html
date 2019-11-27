@@ -257,7 +257,11 @@ a {
     <input type="text" value={{data[0][6]}} name="price" >
 
     <label><b>Suggested Maximum Quantity</b></label>
+    {%if(safetystock[0]>0)%}
     <input style="width: 50%;" type="text" value={{safetystock[0]}}  readonly >
+    {%else%}
+    <input style="width: 50%;" type="text" value=0  readonly >
+    {%endif%}
     </br>
     <label><b>Total Quantity Selected</b></label>
     <input style="width: 50%;" id='total_seleceted_qty' type="text" readonly >

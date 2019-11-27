@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <h1 class="h3 mb-2 text-gray-800">Vendor Management</h1>
+              
+                <a href="{{ url_for('main.addVendor') }}"><button>ADD Vendor</button></a>
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                  <thead>
+                    <tr>
+                       
+                        <th>User ID</th>
+                        
+                      
+                        <th>User Name</th>
+                        <th>VendorID</th>
+                        <th>Company Name</th>
+                        <th>Location</th>
+                        <th>Contact Number</th>
+                        <th>Auto Reponses Enable?</th>
+                        <th> </th>
+                        
+                    </tr>
+                  </thead>
+                  <tfoot>
+                    <tr>
+                      
+                    </tr>
+                  </tfoot>
+                  <tbody>
+                    
+                      {% for item in data %}
+                    
+                    <tr>
+                      
+                      <td>{{item[0]}}</td>
+                      <td>{{item[1]}}</td>
+                      <td>{{item[2]}}</td>
+                      <td>{{item[3]}}</td>
+                      <td>{{item[6]}}</td>
+                      <td>{{item[4]}}</td>
+                      {% if item[5]%}
+                      <td><input type='checkbox' checked disabled></td>   
+                      <td><button onclick="edit('{{item[0]}}','{{item[1]}}','{{item[2]}}','{{item[3]}}','{{item[4]}}',1,'{{item[6]}}')">EDIT</button></td>                   
+                      {%else%}
+                      <td><input type='checkbox' disabled></td>
+                      <td><button onclick="edit('{{item[0]}}','{{item[1]}}','{{item[2]}}','{{item[3]}}','{{item[4]}}',0,'{{item[6]}}')">EDIT</button></td>
+                      {%endif%}
+                      
+                    </tr>
+                  
+                    {% endfor %}
+                    
+                  </tbody>
+                </table>
+                
+              </div>
+              <div class="card" id='editform' style="width: 50%;margin: auto;display:none">
+                  <form>
+                        <div class="form-group row">
+                          <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm">User ID</label>
+                          <div class="col-sm-10">
+                            <input type="tyoe" class="form-control form-control-sm" id="uid" name='uid' readonly>
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm">Vendor ID</label>
+                            <div class="col-sm-10">
+                              <input type="tyoe" class="form-control form-control-sm" id="vid" name='vid' readonly>
+                            </div>
+                          </div>
+                        <div class="form-group row">
+                          <label for="colFormLabel" class="col-sm-2 col-form-label">User Name</label>
+                          <div class="col-sm-10">
+                            <input type="text" class="form-control" id="uname" name='uname'>
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="colFormLabel" class="col-sm-2 col-form-label">Company Name</label>
+                            <div class="col-sm-10">
+                              <input type="text" class="form-control" id="cname" name='cname'>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                              <label for="colFormLabel" class="col-sm-2 col-form-label">Location</label>
+                              <div class="col-sm-10">
+                                <input type="text" class="form-control" id="location" name='location'>
+                              </div>
+                            </div>
+                          <div class="form-group row">
+                              <label for="colFormLabel" class="col-sm-2 col-form-label">Contact Number</label>
+                              <div class="col-sm-10">
+                                <input type="text" class="form-control" id="telno" name='telno'>
+                              </div>
+                            </div>
+                        <div class="form-group row">
+                          <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg">AI Enabel</label>
+                          <div class="col-sm-3">
+                            <input type="checkbox" class="form-control form-control-lg" onchange="if(this.checked) document.getElementById('aienable').value=1; else document.getElementById('aienable').value=0" id="aienable">
+                            <input type="hidden" id='aienable' value=0>
+                          </div>
+                        </div>
+                      </form>
+                        <button id='editButton'>Confirm</button><button onclick='hide()'>back</button>
+                        <script>
+                          $("#editButton").click(function(){
+                            
+                            userid=document.getElementById('uid').value;
+                            username=document.getElementById('uname').value;
+                            vid=document.getElementById('vid').value;
+                            comname=document.getElementById('cname').value;
+                            tno=document.getElementById('telno').value;
+                            lct=document.getElementById('location').value;
+                          if(document.getElementById('aienable').checked)
+                              ai=1
+                          else
+                              ai=0
+                              document.getElementById('editform').style.display="none";
+                          
+                              $.post("{{ url_for('main.update_Vendor') }}",
+                           {
+                              uid:userid,
+                              uname:username,
+                              vid:vid,
+                              cname:comname,
+                              telno:tno,
+                              aienable:ai,
+                              location:lct
+                          },
+                          function(data, status){
+                              alert("Data: " + data );
+                              document.body.scrollTop = 0; // For Safari
+                              document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+                              location.reload()
+                             
+                            });
+                          });
+                                 function hide()
+                                {                                  
+                                  document.getElementById('editform').style.display="none";
+                                }
+                                function edit(id,name,vid,cname,telno,enable,location)
+                                {
+                                  document.getElementById('editform').style.display="block";
+                                  document.getElementById('uid').value=id;
+                                  document.getElementById('uname').value=name;
+                                  document.getElementById('vid').value=vid;
+                                  document.getElementById('cname').value=cname;
+                                  document.getElementById('telno').value=telno;
+                                  document.getElementById('location').value=location;
+                                  if(enable==1)
+                                  document.getElementById('aienable').setAttribute("checked","checked")
+                                  else
+                                  document.getElementById('aienable').removeAttribute("checked")
+                                  document.getElementById('editform').style.display="block";
+                                  
+                                  document.getElementById('uname').focus();
+                                  window.location.href='#editform'
+
+                                }
+                        </script>
+                      
+                    </div>
+            </div>
+          </div>
+         
+
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="../static/vendor/vendor/jquery/jquery.min.js"></script>
+  <script src="../static/vendor/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="../static/vendor/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="../static/vendor/js/sb-admin-2.min.js"></script>
+
+  <!-- Page level plugins -->
+  <script src="../static/vendor/vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="../static/vendor/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+  <!-- Page level custom scripts -->
+  <script src="../static/vendor/js/demo/datatables-demo.js"></script>
+
+  {% endblock %}

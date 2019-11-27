@@ -15,7 +15,8 @@
 			<div class="preloader">
 				 <h1>Request Receive </h1>				 
 				
-    <table style='border:1' >
+         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+           <thead>
             <tr>
             <th>Request ID</th>
             <th>Vendor ID</th>
@@ -26,8 +27,8 @@
             <th>Request Date</th>
             <th>Status</th>
             </tr>
-        
-        
+          </thead>
+          <tbody>
             {% for item in data %}
         
         
@@ -49,6 +50,7 @@
             </tr>
         
         {% endfor %}
+       </tbody>
         </table>  
 
 			</div>

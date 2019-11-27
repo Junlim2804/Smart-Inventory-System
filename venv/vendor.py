@@ -320,3 +320,10 @@ def showRequestCompleteHistory():
 
    return render_template('vendor/showAcceptedOrder.html',data=data,data2=data2)
 
+@vendor.route('/vendor/notification')
+@role('Vendor')
+def notification():
+   cur = con.cursor()
+   cur.execute("select count(*) from request where status='A' and vendor_id=?",current_user.vendorID)
+   result=cur.fetchone()
+   return str(result[0])

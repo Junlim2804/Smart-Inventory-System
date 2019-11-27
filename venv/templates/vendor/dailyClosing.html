@@ -72,7 +72,7 @@
 <td>{{item[1]}}</td>
 <td>{{item[2]}}</td>
 <td>{{item[5]}}<input type="hidden" id="qty_opening_{{item[0]}}" value='{{item[5]}}'></td>
-<td><input style='width:100px' type='number' id="today_price_{{item[0]}}" value=1.00 onchange='calulateRemaining("{{item[0]}}")' name='today_price[]'></td>
+<td><input style='width:100px' type='text' id="today_price_{{item[0]}}" value='{{item[4]}}'onchange='calulateRemaining("{{item[0]}}")' name='today_price[]'></td>
 <td><input style='width:100px' type='number' id="qty_sales_{{item[0]}}" value=0 min=0 onchange='calulateRemaining("{{item[0]}}")' name='qty_sales[]'></td>
 <td><input style='width:100px' type='number' id="qty_disposal_{{item[0]}}" value=0 min=0 onchange='calulateRemaining("{{item[0]}}")' name='qty_disposal[]'></td>
 <td><input type="text" id="qty_remaining_{{item[0]}}" name="qty_cur[]" value="{{item[5]}}" style="background-color:rgba(0, 0, 0, 0);border:0" readonly></td>

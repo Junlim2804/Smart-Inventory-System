@@ -86,7 +86,23 @@
 						
 						
 						<ul class="nav navbar-nav pull-right panel-menu">
-
+								<li class="hidden-xs">
+										<a href="{{ url_for('main.confirmRequest') }}" class="modal-link">
+											<i class="fa fa-bell"></i>
+											<span class="badge" id='notification'>0</span>
+										</a>
+									</li>
+							<script>
+								var refInterval = window.setInterval('update()', 5000);
+								var update = function() {
+ 
+								  $.get("{{ url_for('main.notification') }}", function(data, status){
+    								document.getElementById('notification').innerHTML=data;
+									
+ 									});
+								};
+								update()
+							</script>
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle account" data-toggle="dropdown">
 									<div class="avatar">
@@ -170,7 +186,20 @@
 							
 		
 						</ul>
-				</li>			
+				</li>		
+				
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle">
+							<i class="fa fa-desktop"></i>
+						<span class="hidden-xs">Setting</span>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a  href="{{ url_for('main.manageVendor') }}">Vendor Management</a></li>
+						<li><a href="{{ url_for('main.prod_setting') }}">Product Management</a></li>
+						
+	
+					</ul>
+			</li>		
 
 			</ul>
 		</div>

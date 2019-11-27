@@ -5,7 +5,7 @@
         <div class="container-fluid">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-2 text-gray-800">Stock Table</h1>
+          <h1 class="h3 mb-2 text-gray-800">Product Management</h1>
      
                 <button onclick='addProduct()'>ADD PRODUCT</button>
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -69,7 +69,7 @@
                         <input type="checkbox" class="form-control form-control-lg" id="aienable">
                       </div>
                     </div>
-                    <button id='editButton'>Confirm</button><button>back</button>
+                    <button id='editButton'>Confirm</button><button onclick='hide()'>back</button>
                   </form>
                 </div>
 
@@ -134,10 +134,8 @@
             },
             function(data, status){
                 alert("Data: " + data );
-                if(status=='sucess')
-                {
-                    location.reload();
-                }
+                location.reload()
+               
             });
         });
        function editProduct(id,name,enable)

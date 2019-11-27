@@ -66,7 +66,7 @@ def addVendorData():
       cur.close()
    flash("Vendor Sucessful Added")
    
-   return redirect(url_for('main.addVendor'))
+   return redirect(url_for('main.manageVendor'))
 
    
 
@@ -93,13 +93,13 @@ def showGraph():
       syear=request.args.get('year')
    except Exception as e:
       Product_ID=product[0][0]
-      syear=year[len(year)-1][0]
+      syear=year[0][0]
       print(Product_ID)
       print(syear)
    
    if(Product_ID==None and syear==None):
       Product_ID=product[0][0]
-      syear=year[len(year)-1][0]
+      syear=year[0][0]
       syear=str(syear)
       print(Product_ID)
       print(syear)
@@ -390,7 +390,8 @@ def reject():
       return str(e)
    cur.commit()         
    cur.close()
-   return "SUCESSFUL REJECT" 
+   flash('Sucessful Rejected')
+   return redirect(url_for('main.showPending'))
     
 @main.route('/showRequest')
 @role('Admin')
@@ -448,7 +449,39 @@ def prod_setting():
    cur.close()
    return render_template('showProductSetting.html',data=data,data1=newprod)
 
+@main.route("/ManageVendor")
+@role('Admin')
+def manageVendor():
+   cur=con.cursor()
+   cur.execute('select [user_id],u.[name],u.vendorID,v.name,v.telno,AIEnable,v.location from [user] u,vendor v where v.vendorID=u.vendorID')
+   data=cur.fetchall()
+   cur.close()
+   return render_template('ManageVendor.html',data=data)
+
+@main.route("/updateVendor",methods=['POST'])
+@role('Admin')
+def update_Vendor(): 
+   cur=con.cursor()                            
+   uid=request.form['uid']
+   uname=request.form['uname']
+   vid=request.form['vid']
+   cname=request.form['cname']
+   telno=request.form['telno']
+   aienable=request.form['aienable']
+   location=request.form['location']
+   try:            
+      cur.execute("update vendor set location=?,name=?,telno=?,aienable=? where vendorId=?",location,cname,telno,aienable,vid)
+      cur.execute("update [user] set name=? where user_id=?",uname,uid)
+      
+   except Exception as ex:
+      cur.close()
+      return str(ex)
+   
+   cur.close()    
+   return "Suceesful Update"
+
 @main.route("/updateProduct",methods=['POST'])
+@role('Admin')
 def update_productSetting():
    pid=request.form['pid']
    pname=request.form['pname']
@@ -465,8 +498,8 @@ def update_productSetting():
    cur.close()    
    return "Suceesful Update"
 
-
 @main.route("/addProduct",methods=['POST'])
+@role('Admin')
 def add_product():
    
    pname=request.form['pname']
@@ -494,6 +527,7 @@ def showResponseLog():
    return render_template('showResponseLog.html',data=data)
 
 @main.route('/autoResponse')
+@role('Admin')
 def autoResponses():
    a=""
    sucess=1
@@ -502,27 +536,36 @@ def autoResponses():
    result=cur.fetchall()
    for data in result :
       qty_request=data[3]
-      cur.execute("exec prc_showSafetyStock @pid=?",data[2])
+      cur.execute("set nocount on exec prc_showSafetyStock @pid=?",data[2])
       qty_safe=cur.fetchone()
       cur.execute("select Min(sell_price/quantity) from request where prod_id=? and sell_price is NOT NULL and DATEDIFF(MM, order_date, GETDATE()) < 6 ",data[2])
-      min_price=cur.fetchone()     
+      min_price=cur.fetchone()  
+      print(data[0])   
+      print(data[1])  
+      print(data[2])  
+      print(data[3])  
+      print(data[4])  
       if(data[4]>min_price[0]):
       
          if(qty_request<qty_safe[0]):
-            cur.execute('exec prc_sendOrder @pid=?,@vid=?,@quantity=?,@rid=?,@price=?',data[1],data[2],data[3],data[0],data[4])
-            cur.execute("insert into autoLog(logdate,request_id,details,logtype) values(getdate(),?,?,'RE')",data[0],'Accepted')
+            cur.execute('exec prc_sendOrder @pid=?,@vid=?,@quantity=?,@rid=?,@price=?',data[2],data[1],data[3],data[0],data[4])
+            cur.execute("insert into autoLog(logdate,request_id,details,logtype) values(getdate(),?,?,'R')",data[0],'Accepted')
          else:
             detail='Stock level too low. Safety Stock Quantity:'+str(data[4])
             cur.execute("insert into autoLog(logdate,request_id,details,logtype) values(getdate(),?,?,'RE')",data[0],detail)  
       else:
          detail='Sell price too low'
          cur.execute("insert into autoLog(logdate,request_id,details,logtype) values(getdate(),?,?,'RE')",data[0],detail) 
-
-   
-   
    cur.commit()
    cur.close()
    return redirect(url_for('main.showPending'))
+@main.route('/notification')
+@role('Admin')
+def notification():
+   cur = con.cursor()
+   cur.execute("select count(*) from request where status='P'")
+   result=cur.fetchone()
+   return str(result[0])
 
 import time
 import atexit
