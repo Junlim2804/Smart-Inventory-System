@@ -134,74 +134,43 @@
 	<div class="row">
 		<div id="sidebar-left" class="col-xs-2 col-sm-2">
 			<ul class="nav main-menu">
-					<li class="dropdown">
+				<li class="dropdown">
 					<a href="#" class="dropdown-toggle">
-						<i class="fa fa-bar-chart-o"></i>
-						<span class="hidden-xs">Charts</span>
+							<i class="fa fa-table"></i>
+						<span class="hidden-xs">Inventory Control</span>
 					</a>
 					<ul class="dropdown-menu">
-						<li><a  href="ajax/charts_xcharts.html">xCharts</a></li>
-						<li><a  href="ajax/charts_flot.html">Flot Charts</a></li>
-						<li><a  href="ajax/charts_google.html">Google Charts</a></li>
-						<li><a  href="ajax/charts_morris.html">Morris Charts</a></li>
-						<li><a  href="ajax/charts_amcharts.html">AmCharts</a></li>
-						<li><a  href="ajax/charts_chartist.html">Chartist</a></li>
-						<li><a  href="ajax/charts_coindesk.html">CoinDesk realtime</a></li>
+						<li><a  href="{{ url_for('main.showStock') }}">Show Stock</a></li>
+						<li><a  href="{{ url_for('main.showStockTable') }}">Show Stock Table</a></li>
+						<li><a  href="{{ url_for('main.addStock') }}">Add Stock</a></li>
+	
 					</ul>
 				</li>
-					<li>
-						<a href="{{ url_for('main.addStock') }}" >
 
-							<span class="hidden-xs">Add Stock</span>
+				<li class="dropdown">
+						<a href="#" class="dropdown-toggle">
+							<i class="fa fa-bar-chart-o"></i>
+							<span class="hidden-xs">Sales Control</span>
 						</a>
-					</li>
-				<li>
-					<a href="{{ url_for('main.showStock') }}" >
-						
-						<span class="hidden-xs">Show Stock</span>
-					</a>
+						<ul class="dropdown-menu">
+							<li><a  href="{{ url_for('main.showSales') }}">Show Sales(Daily)</a></li>
+							<li><a  href="{{ url_for('main.showGraph') }}">Show Sales(Monthly)</a></li>
+							<li><a  href="{{ url_for('main.forecast') }}">Forecast Sales</a></li>
+		
+						</ul>
 				</li>
-				<li>
-						<a href="{{ url_for('main.showStockTable') }}" class="dropdown-toggle">
+				<li class="dropdown">
+						<a href="#" class="dropdown-toggle">
+								<i class="fa fa-pencil-square-o"></i>
+							<span class="hidden-xs">Purchase Order</span>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a  href="{{ url_for('main.confirmRequest') }}">Confirm Request</a></li>
+							<li><a href="{{ url_for('main.showAllRequest') }}">Show History</a></li>
 							
-							<span class="hidden-xs">Show Stock Table</span>
-						</a>
-					</li>
-					<li>
-						<a href="{{ url_for('main.showSales') }}" class="dropdown-toggle">
-							
-							<span class="hidden-xs">Show Sales</span>
-						</a>
-					</li>
-				<li class="dropdown">
-					<a href="{{ url_for('main.showGraph') }}" class="dropdown-toggle">
-						
-						<span class="hidden-xs">Show Monthly Sales</span>
-					</a>
-			
-				</li>
-				<li class="dropdown">
-					<a href="{{ url_for('main.confirmRequest') }}" class="dropdown-toggle">
-						
-						 <span class="hidden-xs">Confirm Request</span>
-					</a>					
-				</li>
-				<li class="dropdown">
-					<a href="{{ url_for('main.showAllRequest') }}" class="dropdown-toggle">
-						
-						 <span class="hidden-xs">Request History</span>
-					</a>					
-				</li>
-				<li class="dropdown">
-					<a href="{{ url_for('main.forecast') }}" class="dropdown-toggle">						
-						 <span class="hidden-xs">Forecast Sales</span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a class="ajax-link" href="ajax/tables_simple.html">Simple Tables</a></li>
-						<li><a class="ajax-link" href="ajax/tables_datatables.html">Data Tables</a></li>
-						<li><a class="ajax-link" href="ajax/tables_beauty.html">Beauty Tables</a></li>
-					</ul>
-				</li>
+		
+						</ul>
+				</li>			
 
 			</ul>
 		</div>
@@ -209,10 +178,10 @@
 		<div id="content" class="col-xs-12 col-sm-10">
 			<div id="about">
 				<div class="about-inner">
-					<h4 class="page-header">Open-source admin theme for you</h4>
-					<p>DevOOPS team</p>
+					<h4 class="page-header">SMART INVENTORY CONTROL SYSTEM</h4>
+					<p>FYP team</p>
 					<p>Homepage - <a href='#' target="_blank"></a></p>
-					<p>Email - <a href='#'>devoopsme@gmail.com</a></p>
+					<p>Email - <a href='#'>jslim2804@gmail.com</a></p>
 					<p>Twitter - <a href="#" target="_blank">http://twitter.com/</a></p>
 					<p>Donate - BTC 123Ci1ZFK5V7gyLsyVU36yPNWSB5TDqKn3</p>
 				</div>

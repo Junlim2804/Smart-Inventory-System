@@ -3,6 +3,7 @@ import pandas as pd
 import random
 import matplotlib.pyplot as plt
 import numpy as np
+from werkzeug.security import generate_password_hash
 #bokeh import
 from bokeh.plotting import figure
 from bokeh.embed import components
@@ -37,6 +38,37 @@ con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";
 def index():   
    flash('testing')
    return redirect(url_for('main.profile'))
+@main.route('/addVendor')
+@role('Admin')
+def addVendor():
+   return render_template("addVendor.html")
+
+@main.route('/addVendor',methods=['POST'])
+@role('Admin')
+def addVendorData():
+   user_ID=request.form.get('userid')
+   username=request.form.get('username')  
+   password=request.form['password']
+   
+   location=request.form.get('location')
+   cname=request.form.get('cname')
+   telno=request.form.get('telno')
+   aienable=request.form.get('new_aienable')
+
+   password=generate_password_hash(password, method='sha256')
+   try:
+      cur=con.cursor()
+      cur.execute("set nocount on exec prc_addVendor @id =?,@name = ?,@password = ?,@location = ?,@cname = ?,@telno = ?,@aicontrol =?",user_ID,username,password,location,cname,telno,aienable) 
+      cur.commit()
+      cur.close()
+   except Exception as ex:
+      return str(ex)
+      cur.close()
+   flash("Vendor Sucessful Added")
+   
+   return redirect(url_for('main.addVendor'))
+
+   
 
 @main.route('/profile')
 @role('Admin')
@@ -433,6 +465,7 @@ def update_productSetting():
    cur.close()    
    return "Suceesful Update"
 
+
 @main.route("/addProduct",methods=['POST'])
 def add_product():
    
@@ -459,6 +492,7 @@ def showResponseLog():
    data=cur.fetchall()
    cur.close()
    return render_template('showResponseLog.html',data=data)
+
 @main.route('/autoResponse')
 def autoResponses():
    a=""

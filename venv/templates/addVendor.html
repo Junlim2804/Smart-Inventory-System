@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+			<div class="preloader">
+                <h1>Set Up Vendor Account</h1>
+                    <form action="{{ url_for('main.addVendorData') }}" method="POST">
+                            <div class="form-group row">
+                              <label for="inputUid" class="col-sm-2 col-form-label">UserID</label>
+                              <div class="col-sm-10">
+                                <input type="text   " class="form-control" id="inputUid" name='userid' >
+                              </div>
+                            </div>
+                            <div class="form-group row">
+                                    <label for="inputUname" class="col-sm-2 col-form-label">User Name</label>
+                                    <div class="col-sm-10">
+                                      <input type="text" class="form-control" name='username' id="inputUname" >
+                                    </div>
+                                  </div>
+                            <div class="form-group row">
+                              <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
+                              <div class="col-sm-10">
+                                <input type="password" class="form-control" id="inputPassword3" name='password' placeholder="Password">
+                              </div>
+                            </div>
+
+                            <div class="form-group row">
+                                    <label for="inputLocation" class="col-sm-2 col-form-label">Location</label>
+                                    <div class="col-sm-10">
+                                      <input type="text" class="form-control" id="inputPassword3" name='location' placeholder="Password">
+                                    </div>
+                            </div>
+
+                            <div class="form-group row">
+                                    <label for="inputCName" class="col-sm-2 col-form-label">Company Name</label>
+                                    <div class="col-sm-10">
+                                      <input type="text" class="form-control" id="inputCName" name='cname' placeholder="Password">
+                                    </div>
+                            </div>
+
+                            <div class="form-group row">
+                                    <label for="inputtel" class="col-sm-2 col-form-label">Contat Number</label>
+                                    <div class="col-sm-10">
+                                      <input type="tel" class="form-control" id="inputtel" name='telno' placeholder="Password">
+                                    </div>
+                            </div>
+
+                            <div class="form-group row">
+                                    <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg">Auto Responses</label>
+                                    <div class="col-sm-3">
+                                      <input type="checkbox" class="form-control form-control-lg" onchange="if(this.checked) document.getElementById('new_aienable').value=1; else document.getElementById('new_aienable').value=0"  id="aienable">
+                                      <input type="hidden" value=0 id='new_aienable' name='new_aienable'/>
+                                    </div>
+                            </div>
+
+                            
+                           
+                            
+                            <div class="form-group row">
+                              <div class="col-sm-10">
+                                <button type="submit" class="btn btn-primary">Add Vendor</button>
+                              </div>
+                            </div>
+                          </form>
+			</div>
+			<div id="ajax-content"></div>
+		</div>
+		<!--End Content-->
+	</div>
+</div>
+
+{% endblock %}
