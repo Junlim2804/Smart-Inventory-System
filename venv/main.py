@@ -33,6 +33,7 @@ username = 'Guest'
 password = 'Guest'
 driver= '{ODBC Driver 17 for SQL Server}'
 con = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
+con1 = pyodbc.connect("Driver="+driver+";Server="+server+";Database="+database+";Uid="+username+";Pwd="+password+";TrustServerCertificate=no;Connection Timeout=30;")
 
 
 def index():   
@@ -79,7 +80,7 @@ def profile():
    cur.execute("select TOP 1 logDate from autoLog where logType='F'order by LogDate desc")
    data2=cur.fetchone()
    return render_template('profile.html', name=current_user.name,requestPending=data[0],logdate=data2[0])
-
+from bokeh.palettes import Spectral6
 @main.route('/showGraph',methods = ['GET'])
 @role('Admin')
 def showGraph():   
@@ -114,15 +115,17 @@ def showGraph():
    #y = df.loc[0,1:13].values
    hover1 = HoverTool(tooltips=[("Quantity", "@top")])
    barchart = figure(x_range=X, plot_height=250, title="Stock Counts",
-            toolbar_location=None, tools=[hover1])
-   barchart.vbar(x=X, top=y, width=0.5)
+            toolbar_location=None, tools=[hover1], sizing_mode='stretch_both')
+   source = ColumnDataSource(data=dict(product=X, Sales=y, color=Spectral6))
+   barchart.vbar(x='product', top='Sales', width=0.5,color='color',source=source)
 
-   barchart.xgrid.grid_line_color = 'red'
+   barchart.xgrid.grid_line_color = None
    barchart.y_range.start = 0
    
    hover2 = HoverTool(tooltips=[("Quantity", "@y")])
    p = figure(plot_width=400, plot_height=400,x_range=['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep',
-       'oct', 'nov', 'dec'],tools=[hover2])
+       'oct', 'nov', 'dec'],tools=[hover2], sizing_mode='stretch_both')
+   
   
    # add a line renderer
 
@@ -159,7 +162,7 @@ def showSales():
       y1.append(i[3])
    hover1 = HoverTool(tooltips=[("Quantity", "@top")])
    barchart = figure(x_axis_type='datetime',plot_height=250, title="Sales for "+data[0][1],
-            toolbar_location=None, tools=[hover1])
+            toolbar_location=None, tools=[hover1], sizing_mode='stretch_both')
    barchart.vbar(x=X, top=y1, width=70400000)
 
    barchart.y_range.start = 0
@@ -169,7 +172,7 @@ def showSales():
            years=["%d %b "],
        )
    hover2 = HoverTool(tooltips=[("Quantity", "@y")])
-   p = figure(plot_width=400, plot_height=400,tools=[hover2])
+   p = figure(plot_width=400, plot_height=400,tools=[hover2], sizing_mode='stretch_both')
    p.xaxis.formatter=DatetimeTickFormatter(
         days=["%d %b"],
         months=["%d %b"],
@@ -486,15 +489,16 @@ def update_productSetting():
    pid=request.form['pid']
    pname=request.form['pname']
    aienable=request.form['aienable']
+   price=request.form['price']
+
    cur=con.cursor()
-   try:
-            
-      cur.execute("update product set prod_name=?,prod_aiEnable=? where prod_id=?",pname,aienable,pid)
-      
+ 
+   try:            
+      cur.execute("update product set prod_name=?,prod_aiEnable=?,price=? where prod_id=?",pname,aienable,price,pid)    
    except Exception as ex:
       cur.close()
       return str(ex)
-   
+   cur.commit()
    cur.close()    
    return "Suceesful Update"
 
@@ -503,11 +507,12 @@ def update_productSetting():
 def add_product():
    
    pname=request.form['pname']
+   price=request.form['pprice']
    aienable=request.form['aienable']
    cur=con.cursor()  
    try:  
      
-      sql="insert into product(prod_id,prod_name,prod_aiEnable) values(CONCAT('pr', Next value for seq_productID),'"+pname+"',"+aienable+")"   
+      sql="insert into product(prod_id,prod_name,prod_aiEnable,price) values(CONCAT('pr', Next value for seq_productID),'"+pname+"',"+aienable+",'"+price+"')"   
       print(sql)
       cur.execute(sql)
       cur.commit()
@@ -562,7 +567,7 @@ def autoResponses():
 @main.route('/notification')
 @role('Admin')
 def notification():
-   cur = con.cursor()
+   cur = con1.cursor()
    cur.execute("select count(*) from request where status='P'")
    result=cur.fetchone()
    return str(result[0])

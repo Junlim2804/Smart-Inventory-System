@@ -5,7 +5,7 @@
 			<div class="preloader">
 
                 <h1>Forecast Sales Next 4 month</h1>
-                <form method="GET" action="#">
+                <form method="GET" id='changeform' action="#">
                         <select id='ftype' name='pid' style="width:50%"> 
                                 {% for item in data %}
                                 <option value='{{item[0]}}'>{{item[1]}}</option>
@@ -28,8 +28,14 @@
                                         break;
                                 }
                         }
+
+                        $(document).ready(function(){
+                        $('#ftype').change(function(){
+                                $('#changeform').submit()
+                        });
+                        });
                 </script>
-                <input type="submit" value="Forecast">
+                
                 </form>
             
                 {{ the_div|safe }}

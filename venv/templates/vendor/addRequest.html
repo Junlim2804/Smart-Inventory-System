@@ -72,7 +72,21 @@ a {
 {% block content %}
 
 <div style="display:inline;">
-
+<script>
+  function calPrice()
+  {
+    ppz=document.getElementById("priceperunit").value
+    qty=document.getElementById("qty").value
+    
+    document.getElementById("price").value=ppz*qty
+  }
+  function chgfunc(sel)
+  {
+    x=sel.options[sel.selectedIndex]
+    
+    document.getElementById("priceperunit").value=$(x).attr("data-id")
+  }
+</script>
 
 <form action="{{ url_for('vendor.addRequest') }}" method="POST">
   <div class="container">
@@ -81,9 +95,9 @@ a {
 
     <label for="Product ID"><b>Product ID</b></label>
   </br></br>
-    <select id='ftype' name='pid' style="width:50%"> 
+    <select id='ftype' name='pid' onchange="chgfunc(this)" style="width:50%"> 
       {% for item in data %}
-      <option value='{{item[0]}}'>{{item[1]}}</option>
+      <option data-id={{item[3]}} value='{{item[0]}}'>{{item[1]}}</option>
       
       {% endfor %}
     </select>
@@ -92,10 +106,13 @@ a {
     <input type="text" readonly value={{uid}} name="vid" ></br>
 
     <label for="Quantity"><b>Quantity</b></label></br>
-    <input type="text" placeholder="Enter Quantity" name="qty" ></br>
+    <input type="text" placeholder="Enter Quantity" onchange="calPrice()" id='qty' name="qty" ></br>
+
+    <label for="priceperunit"><b>Price Per Unit</b></label></br>
+    <input type="text" id='priceperunit' value={{data[0][3]}} disabled></br>
 
     <label for="Request_price"><b>Price</b></label></br>
-    <input type="text" placeholder="Enter Request price" name="price" ></br>
+    <input type="text" id='price' name="price" readonly ></br>
 
 
     <hr>
