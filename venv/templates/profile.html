@@ -4,17 +4,148 @@
 
 {% block content %}
 
-<h1 class="title">
-  Welcome, {{name}}
- 
-</br>
-  You have {{requestPending}} Pending not solved.
+<div id="ajax-content"><!--Start Breadcrumb-->
+  <div class="row">
+    <div id="breadcrumb" class="col-xs-12">
+      <ol class="breadcrumb">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">Dashboard</a></li>
+      </ol>
+    </div>
+  </div>
+  <!--End Breadcrumb-->
+  <!--Start Dashboard 1-->
+  <div id="dashboard-header" class="row">
+    <div class="col-xs-10 col-sm-2">
+      <h3>HELLO, ADMIN!</h3>
+    </div>
+    <div class="col-xs-2 col-sm-1 col-sm-offset-1">
+      
+    </div>
+    <div class="clearfix visible-xs"></div>
+    <div class="col-xs-12 col-sm-8 col-md-7 pull-right">
+      <div class="row">
+        <div class="col-xs-4">
+          <div class="sparkline-dashboard" id="sparkline-1"><canvas width="70" height="40" style="display: inline-block; vertical-align: top; width: 70px; height: 40px;"></canvas></div>
+          <div class="sparkline-dashboard-info">
+              <span class="txt-primary">Pending</span>
+           {{requestPending}}
+            
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <div class="sparkline-dashboard" id="sparkline-2"><canvas width="70" height="40" style="display: inline-block; vertical-align: top; width: 70px; height: 40px;"></canvas></div>
+          <div class="sparkline-dashboard-info">
+              <span class="txt-info">REVENUE</span>
+            RM{{revenue}}
+            
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <div class="sparkline-dashboard" id="sparkline-3"><canvas width="70" height="40" style="display: inline-block; vertical-align: top; width: 70px; height: 40px;"></canvas></div>
+          <div class="sparkline-dashboard-info">
+              <span>SALES</span>
+              {{sales}}
+          
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-xs-12 col-sm-6" style="min-height: 100px;">
+      <div class="box ui-draggable ui-droppable">
+        <div class="box-header">
+          <div class="box-name">
+            <i class="fa fa-search"></i>
+            <span>Total Monthly Sales</span>
+          </div>
+          <div class="box-icons">
+            <a class="collapse-link">
+              <i class="fa fa-chevron-up"></i>
+            </a>
+            <a class="expand-link">
+              <i class="fa fa-expand"></i>
+            </a>
+            <a class="close-link">
+              <i class="fa fa-times"></i>
+            </a>
+          </div>
+          <div class="no-move"></div>
+        </div>
+        <div class="box-content">
+          <div id="box-one-content" style="min-height: 300px; padding: 0px; position: relative;">
+          
+              {{ the_div|safe }}
+              <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-1.3.4.min.js"></script>
+              {{ the_script|safe }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-6">
+      <div class="box ui-draggable ui-droppable">
+        <div class="box-header">
+          <div class="box-name">
+            <i class="fa fa-search"></i>
+            <span>Revenue Resources</span>
+          </div>
+          <div class="box-icons">
+            <a class="collapse-link">
+              <i class="fa fa-chevron-up"></i>
+            </a>
+            <a class="expand-link">
+              <i class="fa fa-expand"></i>
+            </a>
+            <a class="close-link">
+              <i class="fa fa-times"></i>
+            </a>
+          </div>
+          <div class="no-move"></div>
+        </div>
+        <div class="box-content">
+          <div id="box-two-content" style="min-height: 300px; padding: 0px; position: relative;">
+              {{ the_div1|safe }}
+              {{ the_script1|safe }}
+          
+          
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-</br>
-Last Forecast is run at {{logdate}}
-</h1>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box boxtest ui-draggable ui-droppable">
+        <div class="box-header">
+          <div class="box-name">
+            <i class="fa fa-search"></i>
+            <span>Vendor Sales</span>
+          </div>
+          <div class="box-icons">
+            <a class="collapse-link">
+              <i class="fa fa-chevron-up"></i>
+            </a>
+            <a class="expand-link">
+              <i class="fa fa-expand"></i>
+            </a>
+            <a class="close-link">
+              <i class="fa fa-times"></i>
+            </a>
+          </div>
+          <div class="no-move"></div>
+        </div>
+        <div class="box-content">
+          <div id="box-three-content" style="min-height: 500px; padding: 0px; position: relative;">
+          
+              {{ the_div2|safe }}
+              {{ the_script2|safe }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div class="col-sm-1">
 
-</div>
 {% endblock %}

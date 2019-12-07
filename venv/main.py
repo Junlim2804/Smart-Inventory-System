@@ -14,6 +14,9 @@ from bokeh.layouts import column
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models.sources import ColumnDataSource
+from bokeh.palettes import Category20
+from bokeh.transform import cumsum
+from math import pi
 #flask import
 from flask_login import login_required, current_user
 from flask import Flask, render_template,url_for,request,redirect,Blueprint,render_template,flash
@@ -76,10 +79,67 @@ def addVendorData():
 def profile():
    cur=con.cursor()
    cur.execute("select count(*) from request where status='P'")
-   data=cur.fetchone()
-   cur.execute("select TOP 1 logDate from autoLog where logType='F'order by LogDate desc")
-   data2=cur.fetchone()
-   return render_template('profile.html', name=current_user.name,requestPending=data[0],logdate=data2[0])
+   pending=cur.fetchone()
+   cur.execute("select sum(sell_price) from request where month(order_date)=11")
+   revenue=cur.fetchone()
+   cur.execute("select count(sell_price) from request where month(order_date)=11")
+   sales=cur.fetchone()
+   #cur.execute("select TOP 1 logDate from autoLog where logType='F'order by LogDate desc")
+   #data2=cur.fetchone()
+   cur.execute("select cast(order_date as date),sum(sell_price) from request where month(order_date)=11 group by cast(order_date as date)")
+   data=cur.fetchall()
+   X=[]
+   y1=[]
+   for i in data:
+      X.append(i[0])
+      y1.append(i[1])
+   cum = np.cumsum(y1)
+   hover2 = HoverTool(tooltips=[("Sales", "@y")])
+   p = figure(plot_width=400, plot_height=400,tools=[hover2], sizing_mode='stretch_both')
+   p.xaxis.formatter=DatetimeTickFormatter(
+         days=["%d %b"],
+         months=["%d %b"],
+         years=["%d %b"],
+      )
+      # add a line renderer
+   p.toolbar_location = None
+   p.line(y=cum,x=X,line_width=2)
+   script, div = components(p)
+
+   SQL_Query = pd.read_sql_query("select prod_name,sum(sell_price) from request r,product p where month(order_date)=11 and p.prod_id=r.prod_id group by prod_name", con)   
+   df = pd.DataFrame(SQL_Query)
+   df.columns = ['item','Sales']
+   df['angle'] = df['Sales']/df['Sales'].sum() * 2*pi
+   df['color'] = Category20[len(df)]
+   pie = figure(plot_height=350, toolbar_location=None,
+           tools="hover", tooltips="@item: RM@Sales", x_range=(-0.5, 1.0), sizing_mode='stretch_both')
+
+   pie.wedge(x=0, y=1, radius=0.4,
+         start_angle=cumsum('angle', include_zero=True), end_angle=cumsum('angle'),
+         line_color="white", fill_color='color', source=df,legend='item')
+
+   pie.axis.axis_label=None
+   pie.axis.visible=False
+   pie.grid.grid_line_color = None
+   script1, div1 = components(pie)
+   cur.execute("select TOP 10  vendor_id,count(*) from vendor_order where month(Send_date)=11 group by vendor_id")
+   data=cur.fetchall()
+   X=[]
+   y=[]
+   for i in data:
+      X.append(i[0])
+      y.append(i[1])
+
+   hover1 = HoverTool(tooltips=[("Quantity", "@Sales")])
+   barchart = figure(x_range=X, plot_height=250,
+               toolbar_location=None, tools=[hover1], sizing_mode='stretch_both')
+   source = ColumnDataSource(data=dict(Vendor=X, Sales=y, color=Spectral6))
+   barchart.vbar(x='Vendor', top='Sales', width=0.5,color='color',source=source)
+
+   barchart.xgrid.grid_line_color = None
+   barchart.y_range.start = 0
+   script2, div2 = components(barchart)
+   return render_template('profile.html', name=current_user.name,requestPending=pending[0],revenue=revenue[0],sales=sales[0],the_div=div, the_script=script,the_div1=div1, the_script1=script1,the_div2=div2, the_script2=script2)
 from bokeh.palettes import Spectral6
 @main.route('/showGraph',methods = ['GET'])
 @role('Admin')
@@ -161,7 +221,7 @@ def showSales():
       X.append(i[2])
       y1.append(i[3])
    hover1 = HoverTool(tooltips=[("Quantity", "@top")])
-   barchart = figure(x_axis_type='datetime',plot_height=250, title="Sales for "+data[0][1],
+   barchart = figure(x_axis_type='datetime',plot_height=450, title="Sales for "+data[0][1],
             toolbar_location=None, tools=[hover1], sizing_mode='stretch_both')
    barchart.vbar(x=X, top=y1, width=70400000)
 
@@ -171,23 +231,23 @@ def showSales():
            months=["%d %b "],
            years=["%d %b "],
        )
-   hover2 = HoverTool(tooltips=[("Quantity", "@y")])
-   p = figure(plot_width=400, plot_height=400,tools=[hover2], sizing_mode='stretch_both')
-   p.xaxis.formatter=DatetimeTickFormatter(
-        days=["%d %b"],
-        months=["%d %b"],
-        years=["%d %b"],
-    )
+   #hover2 = HoverTool(tooltips=[("Quantity", "@y")])
+   #p = figure(plot_width=400, plot_height=400,tools=[hover2], sizing_mode='stretch_both')
+   #p.xaxis.formatter=DatetimeTickFormatter(
+   #     days=["%d %b"],
+   #     months=["%d %b"],
+   #     years=["%d %b"],
+   # )
    # add a line renderer
 
-   p.line(y=y1,x=X,line_width=2)
+   #p.line(y=y1,x=X,line_width=2)
    
    
 
-   tab1 = Panel(child=barchart, title="Bar")
-   tab2 = Panel(child=p, title="Line")
-   tabs = Tabs(tabs=[tab1, tab2])
-   script, div = components(tabs)
+   #tab1 = Panel(child=barchart, title="Bar")
+   #tab2 = Panel(child=p, title="Line")
+   #tabs = Tabs(tabs=[tab1, tab2])
+   script, div = components(barchart)
 
    #script2, div2 = components(p)
    return render_template("showSales.html", bars_count=1,
