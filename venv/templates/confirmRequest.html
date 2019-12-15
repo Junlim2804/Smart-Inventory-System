@@ -256,7 +256,7 @@ a {
     <label for="price"><b>Price</b></label>
     <input type="text" value={{data[0][6]}} name="price" >
 
-    <label><b>Suggested Maximum Quantity</b></label>
+    <label><b>Suggested Maximum Quantity</b></label>    
     {%if(safetystock[0]>0)%}
     <input style="width: 50%;" type="text" value={{safetystock[0]}}  readonly >
     {%else%}

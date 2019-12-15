@@ -173,7 +173,7 @@ def showGraph():
    X = df.columns[1:13].values
    y = df.loc[df['product_id'] == Product_ID].iloc[0,1:13].values
    #y = df.loc[0,1:13].values
-   hover1 = HoverTool(tooltips=[("Quantity", "@top")])
+   hover1 = HoverTool(tooltips=[("Quantity", "@Sales")])
    barchart = figure(x_range=X, plot_height=250, title="Stock Counts",
             toolbar_location=None, tools=[hover1], sizing_mode='stretch_both')
    source = ColumnDataSource(data=dict(product=X, Sales=y, color=Spectral6))
@@ -419,6 +419,9 @@ def confirmRequest():
    data2=cur.fetchall()
    cur.execute("exec prc_showSafetyStock @pid=?",data[0][3])
    safetystock=cur.fetchone()
+   
+   if(safetystock[0]==None):
+      safetystock[0]=0
    cur.close()
 
    return render_template('confirmRequest.html',data=data,data2=data2,safetystock=safetystock)
