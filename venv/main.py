@@ -80,13 +80,13 @@ def profile():
    cur=con.cursor()
    cur.execute("select count(*) from request where status='P'")
    pending=cur.fetchone()
-   cur.execute("select sum(sell_price) from request where month(order_date)=11")
+   cur.execute("select sum(sell_price) from request where month(order_date)=month(getdate()) and year(order_date)=year(getdate())")
    revenue=cur.fetchone()
-   cur.execute("select count(sell_price) from request where month(order_date)=11")
+   cur.execute("select count(sell_price) from request where month(order_date)=month(getdate()) and year(order_date)=year(getdate())")
    sales=cur.fetchone()
    #cur.execute("select TOP 1 logDate from autoLog where logType='F'order by LogDate desc")
    #data2=cur.fetchone()
-   cur.execute("select cast(order_date as date),sum(sell_price) from request where month(order_date)=11 group by cast(order_date as date)")
+   cur.execute("select cast(order_date as date),sum(sell_price) from request where month(order_date)=month(getdate()) and year(order_date)=year(getdate()) group by cast(order_date as date)")
    data=cur.fetchall()
    X=[]
    y1=[]
@@ -106,7 +106,7 @@ def profile():
    p.line(y=cum,x=X,line_width=2)
    script, div = components(p)
 
-   SQL_Query = pd.read_sql_query("select prod_name,sum(sell_price) from request r,product p where month(order_date)=11 and p.prod_id=r.prod_id group by prod_name", con)   
+   SQL_Query = pd.read_sql_query("select prod_name,sum(sell_price) from request r,product p where month(order_date)=month(getdate()) and year(order_date)=year(getdate()) and p.prod_id=r.prod_id group by prod_name", con)   
    df = pd.DataFrame(SQL_Query)
    df.columns = ['item','Sales']
    df['angle'] = df['Sales']/df['Sales'].sum() * 2*pi

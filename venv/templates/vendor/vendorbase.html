@@ -89,7 +89,7 @@
           <div class="bg-white py-2 collapse-inner rounded">
             
             <a class="collapse-item" href="{{ url_for('vendor.vendorRequest') }}">Request Item</a>
-			<a class="collapse-item" href="{{ url_for('vendor.showPending') }}">ShowPending</a>
+			<a class="collapse-item" href="{{ url_for('vendor.showPending') }}">Show Shipped</a>
             <a class="collapse-item" href="{{ url_for('vendor.showRequestHistory') }}">Show Request History</a>            
           
           </div>
@@ -146,7 +146,7 @@
           <ul class="navbar-nav ml-auto">
 
               <li class="nav-item dropdown no-arrow mx-1">
-                  <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <a class="nav-link dropdown-toggle" href="{{ url_for('vendor.showPending') }}" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-envelope fa-fw"></i>
                     <!-- Counter - Messages -->
                     <span class="badge badge-danger badge-counter" id='notification'></span>

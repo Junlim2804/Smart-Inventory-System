@@ -40,15 +40,15 @@ def vendorindex():
 @role("Vendor")
 def index():   
    cur = con.cursor()
-   cur.execute("select sum(quantity*unit_price) from vendor_sales where month(date)=month('11-11-2019')")
+   cur.execute("select sum(quantity*unit_price) from vendor_sales where month(date)=month(getdate()) and year(date)=year(getdate())")
    sales=cur.fetchone()
-   cur.execute("select sum(quantity) from vendor_disposal where month(date)=month('11-11-2019')")
+   cur.execute("select sum(quantity) from vendor_disposal where month(date)=month(getdate()) and year(date)=year(getdate())")
    disposal=cur.fetchone()
    cur.execute("select count(*) from request where status='P' and vendor_id=?",current_user.vendorID)
    pending=cur.fetchone()
    cur.execute("select count(*) from request where status='A' and vendor_id=?",current_user.vendorID)
    shipped=cur.fetchone() 
-   cur.execute("select date,sum(unit_price*quantity) from vendor_sales where month(date)=month('11-11-2011') group by date")
+   cur.execute("select date,sum(unit_price*quantity) from vendor_sales where month(date)=month(getdate()) and year(date)=year(getdate()) group by date")
    data=cur.fetchall()
    X=[]
    y1=[]
@@ -69,7 +69,7 @@ def index():
    script, div = components(p)
 
 
-   SQL_Query = pd.read_sql_query("select p.prod_name,sum(quantity*unit_price) from vendor_sales vs,vendor_store va,warehouse w,Product p where month(date)=month('11-11-2011') and vs.vs_id=va.vs_id and va.Stock_id=w.stock_id and p.prod_id=w.prod_id group by p.prod_name", con)   
+   SQL_Query = pd.read_sql_query("select p.prod_name,sum(quantity*unit_price) from vendor_sales vs,vendor_store va,warehouse w,Product p where month(date)=month(getdate()) and year(date)=year(getdate()) and vs.vs_id=va.vs_id and va.Stock_id=w.stock_id and p.prod_id=w.prod_id group by p.prod_name", con)   
    df = pd.DataFrame(SQL_Query)
    df.columns = ['item','Sales']
    df['angle'] = df['Sales']/df['Sales'].sum() * 2*pi
@@ -175,8 +175,9 @@ def dailyClosing():
    cur.execute("select * from vendor_sales where date=cast(getDATE() as date)")
    data=cur.fetchall()
 
-   #if(len(data)>0):
-   #   return "<h1>CLOSING DONE TODAY</h1>"
+   if(len(data)>0):
+     flash('Closing Done Today')
+     return redirect(url_for('vendor.index'))
    cur.execute("select * from v_vendor_stock where cur_quantity>0 and vendor_id='"+current_user.vendorID+"' order by vs_id asc")
    data = cur.fetchall()   
    return render_template('vendor/dailyClosing.html',data=data)
@@ -203,7 +204,7 @@ def submitClosing():
    cur.commit()
    cur.close()
    flash("Closing")
-   return dailyClosing()
+   return render_template('vendor/dailyClosing.html',data=data)
 
 @vendor.route('/testing')
 def justTesting():

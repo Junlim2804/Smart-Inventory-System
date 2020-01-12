@@ -73,7 +73,7 @@
 	<div class="container-fluid expanded-panel">
 		<div class="row">
 			<div id="logo" class="col-xs-12 col-sm-2">
-				<a href="#">Mangement</a>
+				<a href="{{ url_for('main.profile') }}">Mangement</a>
 			</div>
 			<div id="top-panel" class="col-xs-12 col-sm-10">
 				<div class="row">
@@ -116,7 +116,7 @@
 								</a>
 								<ul class="dropdown-menu">
 									<li>
-										<a href="#">
+										<a href="{{ url_for('main.profile') }}">
 											<i class="fa fa-user"></i>
 											<span>Profile</span>
 										</a>
@@ -124,7 +124,7 @@
 		
 
 									<li>
-										<a href="#">
+										<a href="{{ url_for('main.manageVendor') }}">
 											<i class="fa fa-cog"></i>
 											<span>Settings</span>
 										</a>
