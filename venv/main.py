@@ -402,7 +402,6 @@ def forecast():
    p.line(y=Y,x=X,line_width=2)
  
    
-   p.y_range.start =2000
    script, div = components(p)
    return render_template('showForecast.html',the_div=div, the_script=script,data=product)
 @main.route('/confirmRequest')
